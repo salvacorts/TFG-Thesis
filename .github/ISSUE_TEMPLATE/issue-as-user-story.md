@@ -1,8 +1,8 @@
 ---
-name: 
-about: 
+name: Issue as user story
+about: Make the issue well-defined for everyone involved.
 title: As a <user type>, I want to <task> so that <goal>.
-labels: 
+labels: ''
 assignees: salvacorts
 
 ---
