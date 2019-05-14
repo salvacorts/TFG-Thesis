@@ -1,10 +1,7 @@
-# Trabajo de Fin de Grado: *Título*
+# Trabajo de Fin de Grado: *Metaheurísticas distribuidas usando infraestructura efímera*
 
-**Este sería el README de tu proyecto. Consulta las [instrucciones de
-instalación](INSTALL.md)
-
-### Autor(a): Nombre
-### Tutor(a)(es): Nombre(s)
+### Autor(a): Salvador Corts Sánchez
+### Tutor(a)(es): Juan Julián Merelo Guervós
 ___
 
 La documentación de este proyecto está realizada con `LaTeX`, por lo
@@ -24,8 +21,3 @@ Seguido por
 y de nuevo
 
     pdflatex proyecto.tex
-
-
-# INSTRUCCIONES
-
-Lee [INSTALL.md](INSTALL.md) para las instrucciones de uso.
