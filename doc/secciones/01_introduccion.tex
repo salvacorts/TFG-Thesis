@@ -1,10 +1,10 @@
 \chapter{Introduction}
 \section{Motivation}
-Machine learning have had a huge impact in the recent years across many industries such as the automobile, medical or defense. This progress comes along with more complex machine learning models where many hyper-parameters need to be adjusted to optimize the usefulness of the resulting trained model. Optimizing these hyper parameters is not an easy work and it is usually a time consuming task as well as requires expertise to do it properly.
+Machine learning have had a huge impact in the recent years across many industries such as the automobile, medical or defense. This progress comes along with more complex machine learning models where many hyperparameters need to be adjusted to optimize the usefulness of the resulting trained model. Optimizing these hyperparameters is not an easy work and it is usually a time consuming task as well as requires expertise to do it properly.
 
-The traditional way of performing hyper-parameter optimization is Grid search which is an exhaustive search through a manually specified subset of the hyper-parameters space of a learning algorithm ~\cite{wikipedia-Hyperparameter_optimization}. This approach has a time complexity of $O(n^{2})$ since you have to train your model with the Cartesian Product of all your previously specified sets of possible values for each hyper-parameter; it will take you a considerable amount of time to do so.
+The traditional way of performing hyper-parameter optimization is Grid Search which is an exhaustive search through a manually specified subset of the hyper-parameters space of a learning algorithm ~\cite{wikipedia-Hyperparameter_optimization}. This approach has a time complexity of $O(n^{2})$ since you have to train your model with the Cartesian Product of all your previously specified sets of possible values for each hyperparameter; it will take you a considerable amount of time to do so.
 
-Another well-known approach is called Evolutionary Optimization which uses Evolutionary Algorithms for hyper parameter optimization. Evolutionary algorithms (to be further known as an EA) are optimization algorithms that uses mechanisms inspired by biological processes such as reproduction, mutation or selection. They apply these mechanisms over a population which consist of a set of candidate solutions (in this case a set of values for the hyper-parameter of the model we want to train) known as individuals. Each individual is evaluated with a fitness function that determines the quality of a solution ~\cite{wikipedia-Evolutionary_Algorithm}; for a machine learning model this fitness model can be the accuracy of its predictions.
+Another well-known approach is called Evolutionary Optimization which uses Evolutionary Algorithms for hyperparameter optimization. Evolutionary algorithms (to be further known as an EA) are optimization algorithms that uses mechanisms inspired by biological processes such as reproduction, mutation or selection. They apply these mechanisms over a population which consist of a set of candidate solutions (in this case a set of values for the hyperparameters of the model we want to train) known as individuals. Each individual is evaluated with a fitness function that determines the quality of a solution ~\cite{wikipedia-Evolutionary_Algorithm}; for a machine learning model this fitness model can be the accuracy of its predictions.
 
 Evolutionary algorithms are a successful approach to solve many difficult problems because they are easy to understand, simple to code and have a good performance ~\cite{Intro-to-EA}. But it can take a considerable amount of time to run an EA on a single machine depending of the complexity of the fitness function, the size of the population and how many generations we want to simulate.
 
@@ -19,11 +19,11 @@ We cannot control how the users of the platform will behave in terms of how much
 The overall objective of this project is to provide a common platform for both researchers and contributors that enables them to run Evolutionary Algorithms in a distributed way while minimizing the effort they need to make in order to do so. We can break it down in the following objectives.
 
 \begin{itemize}
-    \item Provide a browser-based interface to contribute to solving problems in a way that the amount of effort the user needs to invest in order to start contributing is minimized.
+    \item Provide a web-browser based interface to contribute to solving problems in a way that the amount of effort the user needs to invest in order to start contributing is minimized.
     
-    \item Design a common middleware to communicate nodes in the same local network to avoid single points of failure as well by providing a scalable Peer-to-Peer design.
+    \item Design a common middleware to communicate nodes within different network to avoid single points of failure as well by providing a scalable and partition-tolerant Peer-to-Peer design.
     
-    \item Benchmark the performance of the platform by running some evolutionary metaheuristics in order to compare it against traditional non-distributed implementations.
+    \item Benchmark the performance of the platform by running different evolutionary metaheuristics in order to compare it against traditional non-distributed implementations.
     
     \item Enable the user to dynamically upload problems to the system so on one hand researchers can submit new projects and contributors can select which project to contribute to from a catalogue of available problems.
     
