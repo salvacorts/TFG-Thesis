@@ -17,8 +17,36 @@ On the other hand, \textit{BOINC} uses a Client-Server architecture where user's
 By using a decentralized architecture where nodes that satisfy certain criteria (detailed in later chapters) act as coordinators of the system, this project aims to provide better scalability and fault-tolerance than BOINC. 
 
 
-
 \section{Evolutionary Algorithms}
+Evolutionary Algorithms are metaheuristic optimization algorithms that take natural evolution as an inspiration to solve problems. They apply bio-inspired operations known as \textit{genetic operators} over a set of solutions to the problem called \textit{population}. Each solution inside the \textit{population} is known as \textit{chromosome} and has a \textit{fitness} value based on the quality of the solution itself. A \textit{chromosome} is made of \textit{genes}, these genes are specific characteristics of a solution representation. 
+ 
+The simulation of this natural process is a probabilistic optimization technique that frequently achieves better results than other classic methods of solving hard problems. \cite{galist}. 
+
+An overview of the implementation of this algorithm consists of the following steps
+
+\begin{enumerate}
+    \item \textbf{Initialize:} create a population with randomly generated chromosomes, and evaluate the fitness of each one.
+    
+    \item Until an specified termination condition is meet, apply the following genetic operators over the population:
+    
+    \begin{enumerate}
+        \item \textbf{\textit{Selection}:} pick which chromosomes from the population will reproduce, in other words, the \textit{crossover} operator will be applied. We should guarantee that the best chromosomes in the population have higher likelihood to be selected, while still giving the opportunity to chromosomes with less quality to reproduce.
+    
+        \item \textbf{\textit{Crossover}:} given two chromosomes, this operator will generate two or more new solutions that will inherit genes from both parents but will be different from them.
+        
+        \item \textbf{\textit{Mutation}:} with a given probability, choose chromosomes to modify some of their genes.
+        
+        \item \textbf{\textit{Evaluation}:} evaluate the fitness of each chromosome in the population.
+        
+        \item \textbf{\textit{Replacement}:} replace the original population with the new one, following a given criteria. 
+        
+    \end{enumerate}     
+\end{enumerate}
+
+Selection, crossover and replacement are explotation methods. Mutation and Initialization are diversification methods.
+
+As we can see, there are some parameters here we can play with: population size, probabilities, etc...
+
 
 \section{Distributed Systems}
 
