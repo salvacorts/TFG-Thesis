@@ -12,3 +12,8 @@ assignees: salvacorts
 **Acceptance criteria**
 
 **Definition of Done**
+- [ ] Initial documentation draft
+- [ ] Review
+- [ ] Corrections
+- [ ] Candidate version
+- [ ] Second review
