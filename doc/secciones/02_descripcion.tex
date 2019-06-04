@@ -32,7 +32,7 @@ An overview of the implementation of this algorithm consists of the following st
     \begin{enumerate}
         \item \textbf{\textit{Selection}:} pick which chromosomes from the population will reproduce, in other words, the \textit{crossover} operator will be applied. We should guarantee that the best chromosomes in the population have higher likelihood to be selected, while still giving the opportunity to chromosomes with less quality to reproduce.
     
-        \item \textbf{\textit{Crossover}:} given two chromosomes, this operator will generate two or more new solutions that will inherit genes from both parents but will be different from them.
+        \item \textbf{\textit{Crossover}:} given two chromosomes, this operator will generate two or more new solutions that will inherit genes from both parents but will be different from them. These new solutions are known as \textit{Offsprings}.
         
         \item \textbf{\textit{Mutation}:} with a given probability, choose chromosomes to modify some of their genes.
         
@@ -43,10 +43,20 @@ An overview of the implementation of this algorithm consists of the following st
     \end{enumerate}     
 \end{enumerate}
 
-Selection, crossover and replacement are explotation methods. Mutation and Initialization are diversification methods.
+\begin{center}
+\begin{figure}[h!]
+    \includegraphics[width=\linewidth]{assets/images/EA_diagram.png}
+    \caption{Overview of all genetic operators for a Evolutionary Algorithm}
+    \label{fig:EA_diagram}
+\end{figure}
+\end{center}
 
-As we can see, there are some parameters here we can play with: population size, probabilities, etc...
 
+To find good solutions with this algorithm we have to keep a good balance between exploitation and diversification. 
+
+On the one hand, the selection, crossover and replacement operators focus on the exploitation of solutions with a promising fitness value in order to optimize solutions within a specific region of the search space. 
+
+On the other hand, mutation and initialization diversify by generating rather different solutions from the existing ones; by doing so, the algorithm is able to explore new regions of the search space as well as avoiding getting stuck in local optima.
 
 \section{Distributed Systems}
 
