@@ -25,9 +25,9 @@ The simulation of this natural process is a probabilistic optimization technique
 An overview of the implementation of this algorithm consists of the following steps
 
 \begin{enumerate}
-    \item \textbf{Initialize:} create a population with randomly generated chromosomes, and evaluate the fitness of each one.
+    \item \textbf{Initialization:} create a population with randomly generated chromosomes, and evaluate the fitness of each one.
     
-    \item Until an specified termination condition is meet, apply the following genetic operators over the population:
+    \item Until an specified termination condition is met, apply the following genetic operators over the population:
     
     \begin{enumerate}
         \item \textbf{\textit{Selection}:} pick which chromosomes from the population will reproduce, in other words, the \textit{crossover} operator will be applied. We should guarantee that the best chromosomes in the population have higher likelihood to be selected, while still giving the opportunity to chromosomes with less quality to reproduce.
@@ -43,14 +43,12 @@ An overview of the implementation of this algorithm consists of the following st
     \end{enumerate}     
 \end{enumerate}
 
-\begin{center}
 \begin{figure}[h!]
+\centering
     \includegraphics[width=\linewidth]{assets/images/EA_diagram.png}
     \caption{Overview of all genetic operators for a Evolutionary Algorithm}
     \label{fig:EA_diagram}
 \end{figure}
-\end{center}
-
 
 To find good solutions with this algorithm we have to keep a good balance between exploitation and diversification. 
 
@@ -59,5 +57,34 @@ On the one hand, the selection, crossover and replacement operators focus on the
 On the other hand, mutation and initialization diversify by generating rather different solutions from the existing ones; by doing so, the algorithm is able to explore new regions of the search space as well as avoiding getting stuck in local optima.
 
 \section{Distributed Systems}
+\begin{quotation}
+\textit{A distributed system is a collection of independent computers that appears to its users as a single coherent system.}
+\end{quotation}
+
+\begin{figure}[h!]
+\centering
+    \includegraphics[scale=0.3]{assets/images/distributed-system_diagram.png}
+    \caption{Distributed System from a user perspective}
+    \label{fig:distributed_system}
+\end{figure}
+
+This collection of computers working as one needs to communicate, sharing information with each other in order to work towards the same objective. This exchange of communication can happen either by using shared memory or message passing.
+
+Shared memory stands for memory that can be accessed concurrently by multiple programs. It is the fastest alternative but has two important disadvantages. The first one is that this alternative is expensive and does not scale well; it needs from these programs to be running within the same machine or at least be running in different machines that can share a common piece of hardware that stores the memory they share. The second main disadvantage of shared memory is that it is error prone; since multiple programs can access the same memory space, race conditions are likely to arise.
+
+\begin{figure}[h!]
+\centering
+    \includegraphics[scale=0.6]{assets/images/shared_memory.png}
+    \caption{Shared memory system of three processors}
+    \label{fig:shared_memory}
+\end{figure}
+
+Message passing is a method used to request behavior on a remote computer by sending an object containing enough information to select and run the appropriate code on the remote computer. this message passing can be synchronous if the requesting machine waits for the remote one to finish with the requested behavior, or asynchronous if it keeps busy on a different task. While synchronous systems are conceptually less complex, asynchronous ones usually achieve better performance.
+
+Although this last approach comes with an overhead penalty due to data copying and delivery across machines, it is the best scaling one since interacting machines do not need to be close to each other to exchange information. Furthermore, because data sharing is explicit in message passing, there is less chance for error.
+
+
+
+
 
 \section{Technosocial Systems}
