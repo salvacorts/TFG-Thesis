@@ -79,10 +79,119 @@ Shared memory stands for memory that can be accessed concurrently by multiple pr
     \label{fig:shared_memory}
 \end{figure}
 
+\newpage
 Message passing is a method used to request behavior on a remote computer by sending an object containing enough information to select and run the appropriate code on the remote computer. this message passing can be synchronous if the requesting machine waits for the remote one to finish with the requested behavior, or asynchronous if it keeps busy on a different task. While synchronous systems are conceptually less complex, asynchronous ones usually achieve better performance.
 
-Although this last approach comes with an overhead penalty due to data copying and delivery across machines, it is the best scaling one since interacting machines do not need to be close to each other to exchange information. Furthermore, because data sharing is explicit in message passing, there is less chance for error.
+Although this last approach comes with an overhead penalty due to data copying and delivery across machines, it is the best scaling one since interacting machines do not need to be close to each other to exchange information. Furthermore, because data sharing is explicit in message passing, there is less chance for error. 
 
+\subsection{CAP Theorem}
+The CAP Theorem states that it is impossible for any distributed system to simultaneously provide consistency, availability and partition tolerance. Only two out of these three properties can be provided at the same time\cite{wikipedia_cap}.
+
+With the aim of easily explaining what these three properties are, as well as demonstrating this theorem, we will take an illustrated example\cite{cap-example} from the personal blog of \textit{Michael Whittaker}, a researcher from UC Berkeley.
+
+\begin{wrapfigure}{r}{0.3\textwidth}
+\centering
+    \includegraphics[width=0.25\textwidth]{assets/images/cap1.png}
+    \caption{Example distributed system}
+    \label{fig:dis-sys-1}
+\end{wrapfigure}
+
+Given a distributed system with two servers, $G_{1}$ and $G_{2}$, that can communicate with each other and are in charge of storing the value for a variable $v$ initialized to $v_{0}$. A client can request to write or read $v$ to any server that will answer back.
+
+In a consistent system (Figure \ref{fig:consisten_system}), any read operation must return the latest written value within the whole system. In our example, if the client writes a new value $v_{1}$ for $v$ in $G_{1}$, when the client later reads $v$ from $G_{2}$, the server must return $v_{1}$.
+\begin{figure}[h!]
+\centering
+    \includegraphics[scale=0.45]{assets/images/cap12.png}
+    \includegraphics[scale=0.6]{assets/images/cap14.png}
+    \includegraphics[scale=0.6]{assets/images/cap17.png}
+    \includegraphics[scale=0.6]{assets/images/cap18.png}
+    \includegraphics[scale=0.6]{assets/images/cap19.png}
+    \caption{A consistent system}
+    \label{fig:consisten_system}
+\end{figure}
+
+A distributed system offers availability if every time a client request is received by a non-failing server, it answers back.
+
+Finally partition tolerance is achieved by the system when it is able to behave as expected if the network is allowed to lose arbitrarily many messages sent from one server to another.
+
+To demonstrate this theorem, consider the system from Figure \ref{fig:non-cap-system} that provides consistency, availability and partition tolerance. When a client writes $v_{1}$ on $G_{1}$, because our system is always available it will respond. But, since it is partitioned, $G_{1}$ cannot replicate the new written value of $v$ to $G_{2}$. If the client now reads $v$ from $G_{2}$ will get $v_{0}$ as a response, making the system inconsistent.
+\begin{figure}[h!]
+\centering
+    \includegraphics[scale=0.6]{assets/images/cap22.png}
+    \includegraphics[scale=0.6]{assets/images/cap23.png}
+    \includegraphics[scale=0.6]{assets/images/cap24.png}
+    \includegraphics[scale=0.6]{assets/images/cap25.png}
+    \includegraphics[scale=0.6]{assets/images/cap26.png}
+    \caption{A partition tolerant and available system}
+    \label{fig:non-cap-system}
+\end{figure}
+
+\subsection{Well known distributed architectures}
+There are many different taxonomies for distributed systems architectures, but the following one is the most general and useful one to better understand this project in the following chapters.
+
+\subsubsection*{Client-Server}
+In this type of distributed system, we can distinguish two main components. The server, that process requests, and the clients, where the user requests services and resources from the servers. Examples of computer applications that uses this architecture are \textit{FTP}, \textit{Email}, or a \textit{Website}.
+
+\begin{figure}[h!]
+\centering
+    \includegraphics[width=\linewidth]{assets/images/client-server.png}
+    \caption{Client-Server architecture. Left, simple one. Right, with load-balancing}
+    \label{fig:client-server}
+\end{figure}
+
+The main disadvantages of this architecture is that it scales poorly than other architectures and it has a single point of failure since usually only one server handles all the requests from the clients. The scalability problem can be reduced by using load-balancing, where client requests are spitted among various servers that are able to handle these requests (Figure \ref{fig:client-server}).
+
+\subsubsection*{Peer-to-peer}
+Shortened as \textit{P2P}, it is a distributed system model where no central coordination by a server or stable hosts is needed. Instead, all responsibilities are uniformly divided among all machines, known as peers. Peers can serve both as clients and as servers\cite{p2p-principles}.
+The first popular Peer-to-Peer system was Napster, a file-sharing service focused on music consumption.
+
+Peer-to-peer networks implements a virtual network in the application layer that acts as an abstraction over lower layers of the actual networking model. This makes the P2P system independent from the physical network topology. Depending on how peers are connected to each other within the virtual network, we can classify these networks in two categories.
+
+\begin{itemize}
+    \item \textbf{Unstructured networks:} There is no particular structure on the virtual networks. When a new peer joins the system, it randomly connects to an already existing peer. This kind of networks scales well with a high rate of peers joining and leaving, but when a peer needs to find a particular resource in the network, there is an important increase of traffic within the network.\cite{structured-p2p}    
+    
+    \item \textbf{Structured networks:} The virtual network follows a specific topology where peers maintain a list of neighbors in order to route requests efficiently though the network. Although it enables the system to lookup for resources faster, it also makes the system less robust against a high rate of peers joining and leaving. It is the case of Distributed Hash Tables (DHT)\cite{dht}, which implements consistent hashing to assign ownership of resources to peers in the network and maintains a list of neighbors called \textit{finger-table} (Figure \ref{fig:dht}) that allows any node to find a resource in a logarithmic time.
+    
+\begin{figure}[h!]
+\centering
+    \includegraphics[width=\linewidth]{assets/images/p2p.png}
+    \caption{Example of unstructured network}
+    \label{fig:client-server}
+\end{figure}    
+    
+\end{itemize} 
+\begin{figure}[h!]
+        \centering
+        \begin{subfigure}{.5\textwidth}
+          \centering
+          \includegraphics[width=\linewidth]{assets/images/dht1.png}
+          \caption{}
+          \label{fig:sub1}
+        \end{subfigure}%
+        \begin{subfigure}{.5\textwidth}
+          \centering
+          \includegraphics[width=\linewidth]{assets/images/dht2.png}
+          \caption{}
+          \label{fig:sub2}
+        \end{subfigure}
+        \caption{(a) Finger table of a DHT. (b) Lookup of resource with key $54$ }
+        \label{fig:dht}
+    \end{figure}
+
+
+\subsubsection*{Hybrid P2P Systems}
+This architecture is a mixture of both Client-Server and Peer-to-Peer systems where certain functionalities are provided by servers\cite{hybrid-p2p}. This approach enables the developer to make trade-offs between the advantages of using a centralized approach that is easier to maintain and develop, and using a peer-to-peer unstructured network.
+
+This model often achieves better performance than pure Client-Server or Peer-to-Peer. Since certain functions that tends to create high networking traffic in a P2P system can by avoided using a centralized approach.
+
+A good example of system using this approach is BitTorrent\cite{bittorrent} (Figure \ref{fig:bittorrent}). With a Client-Server model, \textit{tracker} servers and \textit{torrent} repositories provides structured virtual network, while the rest of nodes constitute the unstructured network with a Peer-to-Peer approach.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.5\linewidth]{assets/images/bittorrent.png}
+    \caption{BitTorrent Network}
+    \label{fig:bittorrent}
+\end{figure}  
 
 
 
