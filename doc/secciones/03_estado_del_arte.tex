@@ -1,2 +1,90 @@
 \chapter{The State of the Art}
+In this chapter we will analyze the most recent advances and promising ideas about distributed evolutionary algorithms and web technologies.
 
+\section{Distributed Evolutionary Algorithms}
+Introduction (cite paper here). We will explain the different distributed models and its advantages and disadvantages
+
+Speak here also about dimension-distributed and Population-distributed 
+
+(Place paper table here comparing them)
+
+\subsection{Master-Slave}
+
+It is a centralized model where one node has the role of master and the rest of slaves.
+The master owns the entire population and is in charge of applying the genetic operators of selection, crossover, mutation, and replacement. The slaves, on the other hand, do not know about other slaves and are in charge of evaluating the fitness of the chromosomes in the population of the master.
+
+The fitness function must require the majority of the computing load, otherwise, a non-distributed approach will outperform this model since the communication between the master and its slaves will be a bottleneck. 
+
+In order to to apply this model to problems where the fitness function computational cost is not high enough, recent researches suggest to distribute other operators such as the crossover or mutation \cite{ismail}, or applying local search on slaves \cite{zhang2}. 
+
+Another way to deal with this kind of problems is having a subpopulation in each slave; it will apply all the genetic operators and will communicate the best chromosomes within its population to the master. The master will be in charge of sending the best chromosomes to all its slaves.\cite{zhang1}
+
+Although this model is simple and therefore easy to prototype, it has important limitations. The master's performance and communication time limits the performance scalability of this model \cite{erick}. Also, even though this model is fault tolerant across slaves (a failing slave can be replaced by a working one), the master still represents a single point of failure in this approach.
+
+\subsection{Island}
+
+\textbf{How it works}
+
+\textbf{Requirements}
+
+\textbf{Advantages}
+
+\textbf{Disadvantages}
+
+\subsection{Cellular}
+
+\textbf{How it works}
+
+\textbf{Requirements}
+
+\textbf{Advantages}
+
+\textbf{Disadvantages}
+
+\subsection{Hierarchical}
+
+\textbf{How it works}
+
+\textbf{Requirements}
+
+\textbf{Advantages}
+
+\textbf{Disadvantages}
+
+\subsection{Pool}
+
+\textbf{How it works}
+
+\textbf{Requirements}
+
+\textbf{Advantages}
+
+\textbf{Disadvantages}
+
+\subsection{Coevolution}
+
+\textbf{How it works}
+
+\textbf{Requirements}
+
+\textbf{Advantages}
+
+\textbf{Disadvantages}
+
+\subsection{Multi-agent}
+
+\textbf{How it works}
+
+\textbf{Requirements}
+
+\textbf{Advantages}
+
+\textbf{Disadvantages}
+
+\section{Web Technologies}
+Speak about JS and mention some frameworks (React, angular, Vue...)
+
+\subsection{Web Assembly}
+Mention that before wasm you had to either spend a lot ofmore computation time in the browser with JS or do it faster in the backend. Now you can use wasm to run computation-intense tasks in the client.
+
+Speak about how it works.
