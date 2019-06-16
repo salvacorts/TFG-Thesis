@@ -23,33 +23,41 @@ Although this model is simple and therefore easy to prototype, it has important 
 
 \subsection{Island}
 
-\textbf{How it works}
+Traditional evolutionary algorithms suffer from premature convergence problems when all chromosomes are around the same local optima. In this model, global search is improved with a rather simple design.
 
-\textbf{Requirements}
+A population is divided into as many subpopulations as processors. Chromosomes migrate from one island to another at a set interval, this is equivalent to the selection operator in the source island and replacement in the destination one.
 
-\textbf{Advantages}
+All islands should end up having the best solution so far within their subpopulations. This can be achieved either synchronously after an specific number of generations \cite{89}, or asynchronously when it is ready \cite{30}. Whereas the synchronous approach is simpler, the asynchronous approach is more flexible and can achieve better efficiency.
 
-\textbf{Disadvantages}
+An important design decision for a island distributed EA is the topology of the islands. Whitley et al \cite{140} conducted an experiment where all islands were fully connected without using any kind of topology. They found that if the migration is conducted among all islands, the algorithm achieves almost the same results as a sequential execution. In recent years, different network topologies for island models have been being studies. Network topologies such as ring, torus, or layered have achieved superior performance in different experiments. \cite{62}
+
+Scalability of this model is limited since performance highly depends on the number of islands and its resulting granularity \cite{58}. However, it has a good partition-tolerance since, although a failing island means a lost important portion of the entire population, it does not have any single-point of failure.
 
 \subsection{Cellular}
+In this model the entire population is distributed across all processors. Ideally one chromosome per processor. Communication between processors is defined by a network topology where chromosomes can only compete and mate with its neighbors.
 
-\textbf{How it works}
+If this model follows a synchronous approach, all cells update their chromosome simultaneously. Otherwise, cells update their chromosomes one by one asynchronously.
 
-\textbf{Requirements}
+Alba et al. \cite{2} compared asynchronous and synchronous cellular-based models, solving discrete and continuous problems. They found that for discrete problems, asynchronous are more efficient, whereas synchronous find solutions with better fitness. For continuous problems, the opposite happened.
 
-\textbf{Advantages}
+The topology plays an essential role in this mode as well. In \cite{68}, experimental results shown that for simple problems a regular topology (with high mean degree distribution) achieves better results. On the other hand, for complex problems a more complex network with high clustering coefficient is preferred.
 
-\textbf{Disadvantages}
+Also, the ratio between the neighborhood radius and the topology radius plays a similar role as the topology itself. For simple problems a higher ratio achieves better results, whereas for complex problems a low ratio is preferred.\cite{5}
 
 \subsection{Hierarchical}
+Also known as Hybrid models, they combine different distributed models in order to take advantage of the problem-solving and scalability capabilities of the models they are made of.
 
-\textbf{How it works}
+\paragraph*{Island \& Master-Slave.} The population is split into several subpopulations across different master nodes. At the same time, these subpopulations will be islands where periodically chromosomes will migrate from one master node to another. A master sends chromosomes from its island to its own slaves, which will evaluate the chromosome fitness function.
 
-\textbf{Requirements}
+This model addresses the scalability shortcoming of the island-based model as well as avoids the single point of failure that the unique master server represented. Moreover, the speedup of this hybrid model is relatively linear \cite{13}.
 
-\textbf{Advantages}
+\paragraph*{Island \& cellular} Multiple processors that store a cells each one, are combined into groups of cells that will behave as islands. The quality of the solutions this model finds are comparable to classical distributed models but it provides better scalability and fault-tolerance.
 
-\textbf{Disadvantages}
+\paragraph*{Island \& Island} When processors in island-model model are heterogeneous, but the model itself is homogeneous (all islands share the same settings of operators, control parameters, fitness evaluations, etc...), slower processors will slow-down the entire algorithm execution. Furthermore, a homogeneous model may not keep a proper balance between exploitation and exploration.  
+
+Heterogeneus island models are being developed in order to address that issue. Sefrioui et al \cite{112}. designed a layered island model of three layers where the first layer was in charge of exploiting the already explored solution space, the second layer balanced exploitation and exploration, and the third one was fully-exploratory.
+
+According to Herrera et al \cite{57}, local and global migration methods are a key issue in these hierarchical models since these methods establish the actual hierarchy between the layers. This approach achieved promising results in Herrera's hierarchical design approach, improving efficiency and collaboration. 
 
 \subsection{Pool}
 
