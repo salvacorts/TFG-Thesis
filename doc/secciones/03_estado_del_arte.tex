@@ -20,7 +20,7 @@ Cellullar                            & Individual                               
 Pool                                 & Population, Individual, Operation               & Depends on design                              & Low                                              & High                                      & Medium                                        \\ \hline
 \end{tabular}%
 }
-\caption{Comparison of population-based distributed models from \cite{eoa-dea}. Modified to acknowledge \textit{single point of failure} issues.}
+\caption{Comparison of population-based distributed models from \cite{soa-dea}. Modified to acknowledge \textit{single point of failure} issues.}
 \label{tab:deas}
 \end{table}
 
@@ -59,6 +59,19 @@ Alba et al. \cite{2} compared asynchronous and synchronous cellular-based models
 The topology plays an essential role in this mode as well. In \cite{68}, experimental results shown that for simple problems a regular topology (with high mean degree distribution) achieves better results. On the other hand, for complex problems a more complex network with high clustering coefficient is preferred.
 
 Also, the ratio between the neighborhood radius and the topology radius plays a similar role as the topology itself. For simple problems a higher ratio achieves better results, whereas for complex problems a low ratio is preferred.\cite{5}
+
+Cellular models are suitable to be easily implemented as a decentralized system. When dealing with a decentralized population where processors (alongside chromosomes) can join and leave without notice, it is very important to maintain the population size within bounds in order to avoid the population to explode or implode. 
+
+Wickramasinghe et al. \cite{p2p-ea} developed a peer-to-peer cellular EA with adaptive selection that decided whether a chromosome is good enough to mate with a neighbor or not with the following probabilistic function:
+
+\begin{equation}
+    P(x) = sig_{m,s}(\Delta f(x)) = \frac{1}{1 + e^{-m \cdot (\Delta f(x)-s)}}
+\end{equation}
+
+Where $s$ and $m$ are adjustable variables that respectively determines where the transition from low probabilities to high probabilities takes place and how sharp that transition is. These variables are automatically adjusted by the algorithm.
+
+As previously stated, topology is a key issue and even more in a peer-to-peer network. J.J Merelo et al \cite{evag} achieved promising results using the \textit{Newscast} protocol, a dynamic and self-organized gossiping protocol for the maintenance of unstructured P2P overlay networks \cite{newscast}, as topology builder and neighborhood policy.
+
 
 \subsection{Hierarchical}
 Also known as Hybrid models, they combine different distributed models in order to take advantage of the problem-solving and scalability capabilities of the models they are made of.
