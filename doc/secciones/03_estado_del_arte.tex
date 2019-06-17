@@ -2,11 +2,27 @@
 In this chapter we will analyze the most recent advances and promising ideas about distributed evolutionary algorithms and web technologies.
 
 \section{Distributed Evolutionary Algorithms}
-Introduction (cite paper here). We will explain the different distributed models and its advantages and disadvantages
+A distributed Evolutionary Algorithm divides across a set of available processors the different genetic operators involved in a classic EA. In \cite{soa-dea}, Gong et al. made a comprehensive analysis of the sate-of-the-art distributed algorithms that we will use to explain and show the most recent advances on the different distributed models that has gain attraction of researchers in the recent years.
 
-Speak here also about dimension-distributed and Population-distributed 
+Since most of practical optimization problems show complex interdependence over the different variables involved, we will focus on population-based distributed models which distribute individuals of a population to multiple processors. Rather than pure dimension-distributed models that divide high dimensional complex problems into several lower dimensional and simpler problems.
 
-(Place paper table here comparing them)
+\begin{table}[h!]
+\centering
+\addtolength{\leftskip} {-2cm} % increase (absolute) value if needed
+\addtolength{\rightskip}{-2cm}
+\resizebox{1.3\textwidth}{!}{%
+\begin{tabular}{|l|l|l|l|l|l|}
+\hline
+\multicolumn{1}{|c|}{\textbf{Model}} & \multicolumn{1}{c|}{\textbf{Parallelism level}} & \multicolumn{1}{c|}{\textbf{Search behaviour}} & \multicolumn{1}{c|}{\textbf{Communication cost}} & \multicolumn{1}{c|}{\textbf{Scalability}} & \multicolumn{1}{c|}{\textbf{Fault-tolerance}} \\ \hline
+Master-Slave                         & Operation, evaluation                           & Similar to sequential EA                       & Medium $\sim$High                                & Medium                                    & Medium                                        \\ \hline
+Island                               & Population                                      & Better Diversity                               & Low $\sim$Medium                                 & Low                                       & Medium $\sim$High                             \\ \hline
+Cellullar                            & Individual                                      & Better Diversity                               & Medium                                           & Medium $\sim$High                         & Medium $\sim$High                             \\ \hline
+Pool                                 & Population, Individual, Operation               & Depends on design                              & Low                                              & High                                      & Medium                                        \\ \hline
+\end{tabular}%
+}
+\caption{Comparison of population-based distributed models from \cite{eoa-dea}. Modified to acknowledge \textit{single point of failure} issues.}
+\label{tab:deas}
+\end{table}
 
 \subsection{Master-Slave}
 
@@ -60,34 +76,13 @@ Heterogeneus island models are being developed in order to address that issue. S
 According to Herrera et al \cite{57}, local and global migration methods are a key issue in these hierarchical models since these methods establish the actual hierarchy between the layers. This approach achieved promising results in Herrera's hierarchical design approach, improving efficiency and collaboration. 
 
 \subsection{Pool}
+A pool storing chromosomes is shared between processors that do no know each others. The pool is divided into as many segments as processors. A processors can take any chromosome within the entire population, but can only overwrite a chromosome in its assigned segment to avoid race conditions.
 
-\textbf{How it works}
+Processors randomly reads as many chomosomes from the pool as they have within their segments. Then, after applying genetics operators, they replace the chromosomes on their segment with the resulting offsprings that have better fitness than the original. 
 
-\textbf{Requirements}
+Since processors do not know each other and race conditions are under control, asynchronization and heterogeneity are almost intrinsic properties on this model. Moreover, new processors can easily join and leave asynchronously by dynamically resizing the segments each processor has.
 
-\textbf{Advantages}
-
-\textbf{Disadvantages}
-
-\subsection{Coevolution}
-
-\textbf{How it works}
-
-\textbf{Requirements}
-
-\textbf{Advantages}
-
-\textbf{Disadvantages}
-
-\subsection{Multi-agent}
-
-\textbf{How it works}
-
-\textbf{Requirements}
-
-\textbf{Advantages}
-
-\textbf{Disadvantages}
+As in Marter-Slave, the pool in this model is a single point of failure that limits the fault tolerance of the system. Replication of the pool can help to address this issue by backing up the state of the pool in case it goes down during the execution of the algorithm. 
 
 \section{Web Technologies}
 Speak about JS and mention some frameworks (React, angular, Vue...)
