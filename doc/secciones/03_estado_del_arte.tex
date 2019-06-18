@@ -98,9 +98,25 @@ Since processors do not know each other and race conditions are under control, a
 As in Marter-Slave, the pool in this model is a single point of failure that limits the fault tolerance of the system. Replication of the pool can help to address this issue by backing up the state of the pool in case it goes down during the execution of the algorithm. 
 
 \section{Web Technologies}
+Dynamic websites are capable of showing different information based on the context and actions made by a user. The logic behind the shown information can be handled by either the server that serves the website or the user's web browser. 
+
+In server-side scripting, the webpage that will be served to the user as a response to a request with given set of parameters, is completely build by the server that handles the request. Therefore all the computation to reason and compose the entire new webpage is handled by the server while the client browser only shows the resulting information without reasoning about it.
+
+The logic behind the server, also known as \textit{backend}, can be implemented in almost any language although specialized frameworks and stacks are being developed in popular languages such as:
+
+\textbf{PHP.} The LAMP stack \cite{lamp} which stands for \textit{Linux, Apache, MySQL, PHP} is a widely adopted architecture where requests are handled by the Apache HTTP server and processed by PHP scripts that retrieve information from a relational database.
+
+\textbf{Python.} Django \cite{django} which follows a Model-View-Controller (MVC) architecture. It comes with out of the box support for user authentication, security analysis, database integration, and administration GUI. Examples of major sites using this framework are \textit{Instagram}, \textit{Bitbucket}, or \textit{Pinterest}. \cite{django-websites}
+
+\textbf{Ruby.} Rails adopts the MVC architecture as well. It comes with the benefits of ruby like rapid-development and easy deployment and configuration. Major websites using this framework are \textit{GitHub}, \textit{Airbnb}, or \textit{Shopify}. \cite{rails}
+
+In order to relieve the server from building the entire webpage, client-side scripting is used to  
+
+
 Speak about JS and mention some frameworks (React, angular, Vue...)
 
+
 \subsection{Web Assembly}
-Mention that before wasm you had to either spend a lot ofmore computation time in the browser with JS or do it faster in the backend. Now you can use wasm to run computation-intense tasks in the client.
+Mention that before wasm you had to either spend a lot of more computation time in the browser with JS or do it faster in the backend. Now you can use wasm to run computation-intense tasks in the client.
 
 Speak about how it works.
