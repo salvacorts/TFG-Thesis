@@ -100,20 +100,62 @@ As in Marter-Slave, the pool in this model is a single point of failure that lim
 \section{Web Technologies}
 Dynamic websites are capable of showing different information based on the context and actions made by a user. The logic behind the shown information can be handled by either the server that serves the website or the user's web browser. 
 
+\subsection{Server-Side processing}
+
 In server-side scripting, the webpage that will be served to the user as a response to a request with given set of parameters, is completely build by the server that handles the request. Therefore all the computation to reason and compose the entire new webpage is handled by the server while the client browser only shows the resulting information without reasoning about it.
 
 The logic behind the server, also known as \textit{backend}, can be implemented in almost any language although specialized frameworks and stacks are being developed in popular languages such as:
 
-\textbf{PHP.} The LAMP stack \cite{lamp} which stands for \textit{Linux, Apache, MySQL, PHP} is a widely adopted architecture where requests are handled by the Apache HTTP server and processed by PHP scripts that retrieve information from a relational database.
+\begin{enumerate}[a)]
+	\item \textbf{PHP.} The LAMP stack \cite{lamp} which stands for \textit{Linux, Apache, MySQL, PHP} is a widely adopted architecture where requests are handled by the Apache HTTP server and processed by PHP scripts that retrieve information from a relational database.
 
-\textbf{Python.} Django \cite{django} which follows a Model-View-Controller (MVC) architecture. It comes with out of the box support for user authentication, security analysis, database integration, and administration GUI. Examples of major sites using this framework are \textit{Instagram}, \textit{Bitbucket}, or \textit{Pinterest}. \cite{django-websites}
+	\item \textbf{Python.} Django \cite{django} which follows a Model-View-Controller (MVC) architecture. It comes with out of the box support for user authentication, security analysis, database integration, and administration GUI. Examples of major sites using this framework are \textit{Instagram}, \textit{Bitbucket}, or \textit{Pinterest}. \cite{django-websites}
+	
+	\item \textbf{Ruby.} Rails adopts the MVC architecture as well. It comes with the benefits of ruby like rapid-development and easy deployment and configuration. Major websites using this framework are \textit{GitHub}, \textit{Airbnb}, or \textit{Shopify}. \cite{rails}
+\end{enumerate}
 
-\textbf{Ruby.} Rails adopts the MVC architecture as well. It comes with the benefits of ruby like rapid-development and easy deployment and configuration. Major websites using this framework are \textit{GitHub}, \textit{Airbnb}, or \textit{Shopify}. \cite{rails}
+\subsection{Client-Side processing}
+In order to relieve the server from building the entire webpage, client-side scripting is used to handle actions made by the user in the browser itself. JavaScript is the most widely adopted scripting language used to develop dynamic webpages \cite{js_stats}, and major web browsers comes with dedicated JavaScript engines built in.  
 
-In order to relieve the server from building the entire webpage, client-side scripting is used to  
+JavaScript scripts are embedded in or included from HTML and interact with the webpage by manipulating its DOM; a tree-like structure where each node is an object that represents a part of the webpage. 
+
+In 2008, Google released \textit{Chrome V8} \cite{chrome_v8}, the open-source JavaScript engine that powers \textit{Google Chrome}. Contrary to other engines which just intepret JavaScript, V8 compiles JavaScript to native machine code before executing it as well as dynamically optimizes it at runtime.
+
+Firefox, on the other hand, uses SpiderMonkey which compiles to native code critical parts of the scripts to be executed \cite{tampermoneky}. The remaining code that is not compiled to native code is compiled to a special byte-code which although is not as fast as native code, it is faster to compile.
+
+A comparison between these two browsers can be obtained in \cite{firefox_benchmark}. As we can see, in the most recent releases of both browsers, Chrome V8 has the best overall performance.
+
+\subsection{Hybrid approach}
+Speak about using both client side scripting and server side scripting and comunication methods such as (g)RPC, HTTP Rest, etc...
+
+Webpages often take a hybrid approach where the DOM is manipulated client-side but certain information is obtained server-side since there are specific tasks that should not or cannot be performed in the client because they can require access delicate information or high processing power. This information is usually requested to a server by using a SOAP, REST or gRPC service.
+
+\begin{enumerate}[a)]
+	\item \textbf{SOAP.} \textit{Simple Object Access Protocol} \cite{SOAP} uses XML to transfer structured information over a variety of underlying protocols. SOAP is an official protocol that comes with its own specification so that, although it provides guarantees over reliability and security among other properties for more intricate systems, it has an extra complexity and therefore it requires more bandwidth and resources than other alternatives.
+
+	\item \textbf{REST.} Stands for \textit{Representational State Transfer}. Contrary to SOAP or RPC, it is not a protocol by itself but rather a software architectural style that defines certain design patterns to be followed in order to develop stateless and loosely coupled applications where information is exchanged over HTTP. REST aims to provide easy cacheability and self-descriptive messages where, by using  the different HTTP  methods, a resource identified by a given URI can be created, retrieved, modified or deleted. 
+	
+	REST applications often use JSON as data representation method since it is more human readable and faster to serialize and deserialize than XML. Also, since REST inherits HTTP methods, requesting information to a server is easier than with SOAP.
+
+	\item \textbf{RPC.} Abbreviation of Remote Procedure Call, it is a remote method invocation protocol where a client can request a server to execute a subroutine and get its result. RPC enables the programmer to invoke that remote procedure as if it was a local procedure, without the programmer explicitly coding the underlying communication.
+	
+	After using it internally for years, Google released gRPC \cite{grpc} in 2015; an open source RPC system that uses HTTP for transport. Data serialization and interface definition is made with Protocol Buffers; Google's language-neutral, platform-neutral and extensible solution for serializing structured data \cite{protobuf}.
+	
+	As seen in Figure \ref{fig:protobuff_json_xml}, by using Protocol Buffers, gRPC is able to outperform JSON and XML serialization time and in-memory size. In 2019, gRPC announced support for web-browsers \cite{grpc-web-announce} and positioned as an promising alternative to REST and SOAP. 
+	
+	\begin{figure}[h!]
+		\centering
+    	\includegraphics[width=0.45\linewidth]{assets/images/protobuff-json-xml_rw.png}
+    	\includegraphics[width=0.45\linewidth]{assets/images/protobuff-json-xml_size.png}
+    	\caption{Comparison of serializarion time and serialization in-memory (raw) size of JSON, XML and Protocol Buffers. \cite{protobuff_json_xml}}
+    	\label{fig:protobuff_json_xml}
+	\end{figure}
+	
+ \end{enumerate}
 
 
-Speak about JS and mention some frameworks (React, angular, Vue...)
+
+
 
 
 \subsection{Web Assembly}
