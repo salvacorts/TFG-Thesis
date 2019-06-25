@@ -29,9 +29,9 @@ Pool                                 & Population, Individual, Operation        
 It is a centralized model where one node has the role of master and the rest of slaves.
 The master owns the entire population and is in charge of applying the genetic operators of selection, crossover, mutation, and replacement. The slaves, on the other hand, do not know about other slaves and are in charge of evaluating the fitness of the chromosomes in the population of the master.
 
-The fitness function must require the majority of the computing load, otherwise, a non-distributed approach will outperform this model since the communication between the master and its slaves will be a bottleneck. 
+The fitness function must require the majority of the computing load, otherwise, a non-distributed approach will outperform this model since the communication between the master and its slave will produce a bottleneck. 
 
-In order to to apply this model to problems where the fitness function computational cost is not high enough, recent researches suggest to distribute other operators such as the crossover or mutation \cite{ismail}, or applying local search on slaves \cite{zhang2}. 
+In order to apply this model to problems where the fitness function computational cost is not high enough, recent researches suggest to distribute other operators such as the crossover or mutation \cite{ismail}, or applying local search on slaves \cite{zhang2}. 
 
 Another way to deal with this kind of problems is having a subpopulation in each slave; it will apply all the genetic operators and will communicate the best chromosomes within its population to the master. The master will be in charge of sending the best chromosomes to all its slaves.\cite{zhang1}
 
@@ -50,7 +50,7 @@ An important design decision for a island distributed EA is the topology of the 
 Scalability of this model is limited since performance highly depends on the number of islands and its resulting granularity \cite{58}. However, it has a good partition-tolerance since, although a failing island means a lost important portion of the entire population, it does not have any single-point of failure.
 
 \subsection{Cellular}
-In this model the entire population is distributed across all processors. Ideally one chromosome per processor. Communication between processors is defined by a network topology where chromosomes can only compete and mate with its neighbors.
+In this model the entire population is distributed across all processors having ideally one chromosome per processor. Communication between processors is defined by a network topology where chromosomes can only compete and mate with its neighbors.
 
 If this model follows a synchronous approach, all cells update their chromosome simultaneously. Otherwise, cells update their chromosomes one by one asynchronously.
 
@@ -123,7 +123,7 @@ In 2008, Google released \textit{Chrome V8} \cite{chrome_v8}, the open-source Ja
 
 Firefox, on the other hand, uses SpiderMonkey which compiles to native code critical parts of the scripts to be executed \cite{tampermoneky}. The remaining code that is not compiled to native code is compiled to a special byte-code which although is not as fast as native code, it is faster to interpret.
 
-A comparison between these two browsers can be obtained in \cite{firefox_benchmark}. As we can see, in the most recent releases of both browsers, Chrome V8 has the best overall performance.
+A comparison between these two browsers can be obtained in \cite{firefox_benchmark}. As can seen, in the most recent releases of both browsers, Chrome V8 has the best overall performance.
 
 \subsection{Hybrid approach}
 Speak about using both client side scripting and server side scripting and comunication methods such as (g)RPC, HTTP Rest, etc...
