@@ -115,13 +115,13 @@ The logic behind the server, also known as \textit{backend}, can be implemented 
 \end{enumerate}
 
 \subsection{Client-Side processing}
-In order to relieve the server from building the entire webpage, client-side scripting is used to handle actions made by the user in the browser itself. JavaScript is the most widely adopted scripting language used to develop dynamic webpages \cite{js_stats}, and major web browsers comes with dedicated JavaScript engines built in.  
+In order to relieve the server from building the entire webpage, client-side scripting is used to handle actions made by the user in the browser itself. JavaScript (also known as JS) is the most widely adopted scripting language used to develop dynamic webpages \cite{js_stats}, and major web browsers comes with dedicated JavaScript engines built in.  
 
 JavaScript scripts are embedded in or included from HTML and interact with the webpage by manipulating its DOM; a tree-like structure where each node is an object that represents a part of the webpage. 
 
 In 2008, Google released \textit{Chrome V8} \cite{chrome_v8}, the open-source JavaScript engine that powers \textit{Google Chrome}. Contrary to other engines which just intepret JavaScript, V8 compiles JavaScript to native machine code before executing it as well as dynamically optimizes it at runtime.
 
-Firefox, on the other hand, uses SpiderMonkey which compiles to native code critical parts of the scripts to be executed \cite{tampermoneky}. The remaining code that is not compiled to native code is compiled to a special byte-code which although is not as fast as native code, it is faster to compile.
+Firefox, on the other hand, uses SpiderMonkey which compiles to native code critical parts of the scripts to be executed \cite{tampermoneky}. The remaining code that is not compiled to native code is compiled to a special byte-code which although is not as fast as native code, it is faster to interpret.
 
 A comparison between these two browsers can be obtained in \cite{firefox_benchmark}. As we can see, in the most recent releases of both browsers, Chrome V8 has the best overall performance.
 
@@ -141,13 +141,13 @@ Webpages often take a hybrid approach where the DOM is manipulated client-side b
 	
 	After using it internally for years, Google released gRPC \cite{grpc} in 2015; an open source RPC system that uses HTTP for transport. Data serialization and interface definition is made with Protocol Buffers; Google's language-neutral, platform-neutral and extensible solution for serializing structured data \cite{protobuf}.
 	
-	As seen in Figure \ref{fig:protobuff_json_xml}, by using Protocol Buffers, gRPC is able to outperform JSON and XML serialization time and in-memory size. In 2019, gRPC announced support for web-browsers \cite{grpc-web-announce} and positioned as an promising alternative to REST and SOAP. 
+	As seen in Figure \ref{fig:protobuff_json_xml}, by using Protocol Buffers, gRPC is able to outperform JSON and XML serialization time and in-memory size. In 2019, gRPC announced support for web-browsers \cite{grpc-web-announce} and positioned as a promising alternative to REST and SOAP. 
 	
 	\begin{figure}[h!]
 		\centering
     	\includegraphics[width=0.45\linewidth]{assets/images/protobuff-json-xml_rw.png}
     	\includegraphics[width=0.45\linewidth]{assets/images/protobuff-json-xml_size.png}
-    	\caption{Comparison of serializarion time and serialization in-memory (raw) size of JSON, XML and Protocol Buffers. \cite{protobuff_json_xml}}
+    	\caption{Comparison of serializarion time and serialization in-memory (raw) size of JSON, XML and Protocol Buffers. 		\cite{protobuff_json_xml}}
     	\label{fig:protobuff_json_xml}
 	\end{figure}
 	
@@ -155,10 +155,31 @@ Webpages often take a hybrid approach where the DOM is manipulated client-side b
 
 
 
-
-
-
 \subsection{Web Assembly}
-Mention that before wasm you had to either spend a lot of more computation time in the browser with JS or do it faster in the backend. Now you can use wasm to run computation-intense tasks in the client.
+Even though JavaScript performance has improved dramatically in recent years, its performance is still much lower than low-level languages since either compilation or interpretation are done at runtime. Therefore, tasks that require relatively high computational power have been executed server-side. In 2015 \cite{wasm-roadmap}, an alternative to JavaScript for intensive use cases began to take shape and in 2017, WebAssembly \cite{webassembly-announcement} was released as a web standard \cite{w3c-wasm}. 
 
-Speak about how it works.
+WebAssembly, abbreviated as wasm, provides major gains in performance, by compiling low-level languages to a compact binary format that is executed by web-browsers with near-native performance \cite{wasm-concepts}. Furthermore, whereas compiling a large JavaScript script can take long, wasm files are already compiled and optimized out thus the time needed to start executing code is much smaller compared. 
+
+Wasm does not attempt to replace JavaScript, instead, it aims to be an extra component that developers can integrate into their JavaScript application for intense tasks. So that, a communication layer between WebAssembly and JavaScript is provided in order to access JS functions from wasm and the other way around.
+
+In \cite{wasm-compared}, a real-world experiment comparing WebAssembly to compiled and non-compiled JavaScript was carried out by running a \textit{GameBoy} emulator on different browsers and devices. The result was a superior performance of wasm in every scenario being up to 11.71 times faster than JavaScript in Firefox, and 1.45 times faster than compiled JavaScript in chrome. Moreover, in mobile browsers the difference is even bigger; being wasm 16.11 times faster than raw JS, and 2.07 times faster than compiled JS.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
