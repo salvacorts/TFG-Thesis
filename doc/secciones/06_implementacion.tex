@@ -1,14 +1,51 @@
 \chapter{Implementation}
+In this chapter, we will follow up the development process of each milestone. For each one, first, we will describe the issues involved. Then, we will discuss the design decisions made, and finally, we will discuss the design decisions and interesting lessons and problems we have encountered in that iteration.
 
-Development follow up for each milestone 
+The Github repository used for the development of this project can be found at \href{https://github.com/salvacorts/TFG-Parasitic-Metaheuristics}{github.com/salvacorts/TFG-Parasitic-Metaheuristics}.
 
-Describe the objectives of each milestone
-Describe interesting points of the development
-Conclusions
+\section{Demo Problem}
+This milestone contained the following user story:
 
+\subsubsection*{\href{https://github.com/salvacorts/TFG-Parasitic-Metaheuristics/issues/20}{Issue \#20}: As an Administrator, I want to run a demo problem so that I can test the platform} 
 
+Fist of all, we need a problem that can perform well in the platform. This problem will be used to test the platform as we develop it further.
 
-La implementación del software se ha dividido en hitos. Estos, han sido definidos en Github
-y cada uno de ellos contiene un grupo de \textit{issues} que se corresponden con las distintas
-mejoras que se han ido incorporando al software a lo largo de su desarrollo.\\
+We chose a multilayer perceptron (MLP) trained with the \textit{Glass} and \textit{Cancer1a} datasets from \textit{proben1} benchmark \ref{proben1}; a set of benchmarks for neural network training algorithms.
+
+The \textit{Glass} dataset is made of 214 samples of glass where each one contains the percent content of 8 different chemical elements, its refractive index, and the type of glass (class attribute). A model that can predict the kind of glass from new samples, can be useful in criminal forensics.
+
+\textit{Cancer1a} is made of 699 samples of breast cancer. Each one contains a sample identification number, 9 attributes about the cell that the sample measures, and the class of cancerous cell: either benign or malignant.
+
+There are two main reasons to have chosen a multilayer perceptron to develop and demo the platform. On the one hand, its fitness function takes more time than the average latency of communication between nodes in the platform. On the other hand, we have previous experience \ref{gprop} with this problem and we are familiar with some useful genetic operators we can apply.
+
+The genetic operators of the genetic algorithm we will use to optimize the neural network are the same ones proposed by P. A. Castillo et al in G-Prop \cite{gprop}:
+
+\begin{itemize}
+	\item \textbf{Selection:}
+	\item \textbf{Mutation:}
+	\item \textbf{Crossover:}
+	\item \textbf{Add Neuron:}
+	\item \textbf{Eliminate Neuron:}
+	\item \textbf{Substitute Neuron:}
+	\item \textbf{Train:}
+\end{itemize}
+
+We have developed our evolutionary algorithm using the \textit{Go} language \cite{go}. Go, or Golang, is a is a statically typed and compiled open-source programming language that features a C-like syntax but that comes with garbage collection and built-in easy support for concurrent and distributed programming thanks to its \textit{goroutines} \cite{channels} and \textit{channels} \cite{channels}.
+
+There are two main pre-existing libraries that we will use:
+
+\begin{itemize}
+	\item \textbf{Go Perceptron:} A single and multilayered perceptron classifier trained with Backpropagation \cite{go-perceptron-go}.
+	\item \textbf{eaopt:} An evolutionary optimization library that supports various evolutionary optimization algorithms such as genetic algorithms, particle swarm, and differential evolution among others. It also provides different genetic algorithm models, selection, mutation and crossover operators out of the box \cite{eaopt}.
+\end{itemize}
+
+Now talk about the implementation itself.
+
+Introduce that we have to run it in both native code and webassembly.
+
+Talk about the modification made to Go perceptron.
+Talk about the modifications made to eaopt
+
+talk about the result and time in native
+Talk about the results and time in Wasm
 
