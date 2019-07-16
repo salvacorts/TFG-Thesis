@@ -21,13 +21,24 @@ There are two main reasons to have chosen a multilayer perceptron to develop and
 The genetic operators of the genetic algorithm we will use to optimize the neural network are the same ones proposed by P. A. Castillo et al in G-Prop \cite{gprop}:
 
 \begin{itemize}
-	\item \textbf{Selection:}
-	\item \textbf{Mutation:}
-	\item \textbf{Crossover:}
-	\item \textbf{Add Neuron:}
-	\item \textbf{Eliminate Neuron:}
-	\item \textbf{Substitute Neuron:}
-	\item \textbf{Train:}
+	\item \textbf{Selection:} Roulette tournament where two chromosomes are randomly selected from the population to cross.
+	
+	\item \textbf{Evaluation:} Train a copy of the chromosome with the training dataset without Backpropagation. The fitness of the chromosome that will be returned by this operator will be the classification error obtained by predicting new samples from the validation dataset with the trained copy of the chromosome.
+	$$ Error = 1 - \frac{TP + TN}{TP + TN + FP + FN}  $$
+	
+	Where $TP = $ True Positives, $TN = $ True Negatives, $FP = $ False Positives, and $FN = $ False Negatives.
+	
+	\item \textbf{Mutation:} First, modify the learning rate of the network by adding a random number uniformly distributed in the range [-0.05, 0.05]. Then, with certain probability, for each neuron in each hidden layer (in our case there is just one hidden layer), add a random number in the range [-0.1, 0.1] following uniform distribution to all its weights.
+	
+	\item \textbf{Crossover:} Apply a multi-point crossover between two chormosomes where the neurons of both parents will be mixed resulting in two new offspring that will contain neurons from both parents. The learning rates of the two parents are swapped as well.
+	
+	\item \textbf{Add Neuron:} Add a new randomly initialized neuron to the hidden layer that will be connected with the neurons in the following and previous layer. This operator performs incremental learning and attempts to address the problem of estimating the number of neurons to use in the hidden layer.
+	
+	\item \textbf{Eliminate Neuron:} Remove a randomly selected neuron from the hidden layer performing decremental learning. This operators aims to reduce the risks of over-fitting due to having too many neurons in the hidden layer.
+	
+	\item \textbf{Substitute Neuron:} Replace a random neuron from the hidden layer with a new one randomly initialized.
+	
+	\item \textbf{Train:} This operator performs a local search by training the multi-layer perceptron represented in the chromosome with Backpropagation \cite{backpropagation} for a given number of epochs.
 \end{itemize}
 
 We have developed our evolutionary algorithm using the \textit{Go} language \cite{go}. Go, or Golang, is a is a statically typed and compiled open-source programming language that features a C-like syntax but that comes with garbage collection and built-in easy support for concurrent and distributed programming thanks to its \textit{goroutines} \cite{channels} and \textit{channels} \cite{channels}.
