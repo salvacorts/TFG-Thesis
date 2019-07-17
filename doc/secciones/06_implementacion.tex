@@ -1,5 +1,5 @@
-\chapter{Implementation}
-In this chapter, we will follow up the development process of each milestone. For each one, first, we will describe the issues involved. Then, we will discuss the design decisions made, and finally, we will discuss the design decisions and interesting lessons and problems we have encountered in that iteration.
+\chapter{Development follow up}
+In this chapter, we will follow development of each milestone. For each one, first, we will describe the issues involved. Then, we will describe the design decisions made, and finally, we will discuss interesting lessons and problems we have encountered in that iteration.
 
 The Github repository used for the development of this project can be found at \href{https://github.com/salvacorts/TFG-Parasitic-Metaheuristics}{github.com/salvacorts/TFG-Parasitic-Metaheuristics}.
 
@@ -50,13 +50,70 @@ There are two main pre-existing libraries that we will use:
 	\item \textbf{eaopt:} An evolutionary optimization library that supports various evolutionary optimization algorithms such as genetic algorithms, particle swarm, and differential evolution among others. It also provides different genetic algorithm models, selection, mutation and crossover operators out of the box \cite{eaopt}.
 \end{itemize}
 
-Now talk about the implementation itself.
+\subsubsection*{Implementation}
+As deliverable prototype for the end of this milestone, we wanted to have the same solution running on both native and browser environments. Typically we would have had to write the same code twice; in Go for native and in Java Script for the browser, but thanks to WebAssembly, we could share the same code base between both native and browsers with just minor changes.
 
-Introduce that we have to run it in both native code and webassembly.
+The \textit{Go perceptron} library fitted our necessities well so we didn't need to modify it internally at the very first moment. On the other hand, we had to modify \textit{eopt} so we could execute other genetic operators over the population apart from the mutation, evaluation and crossover operators.
 
-Talk about the modification made to Go perceptron.
-Talk about the modifications made to eaopt
+In order to use eaopt, first the developer needs to configure the number of generations, the population size and the genetic model to use in the genetic algorithm. The model defines how the algorithm evolves the population with the selection, mutation and crossover operators; in our particular case, we decided to use a generational model.
 
-talk about the result and time in native
+\begin{lstlisting}[
+caption={eaopt's Genome interface},
+label={lst:ExtraOperator}, captionpos=b]
+type Genome interface {
+	Evaluate() (float64, error)
+	Mutate(rng *rand.Rand)
+	Crossover(genome Genome, rng *rand.Rand)
+	Clone() Genome
+}
+\end{lstlisting}
+
+Since the implementation of these models does not contemplate additional genetic operators apart from those defined in the \textit{Genome} interface from \textit{eaopt}, we had to add an additional member to the generational model class containing an array of extra genetic operators (Listing \ref{lst:ExtraOperator}) that are used after applying mutation and crossover over a given chromosome as seen in Listing \ref{lst:opapp}.
+
+\begin{lstlisting}[
+caption={Definition of an extra genetic operator as a struct with a float representing the probability op application, and a function that takes genome and returns a modified one.},
+label={lst:ExtraOperator},
+captionpos=b]
+type ExtraOperator struct {
+	Operator    func(Genome, *rand.Rand) Genome
+	Probability float64
+}
+\end{lstlisting}
+
+\begin{lstlisting}[
+caption={Application of extra operators after mutating.},
+label={lst:opapp},
+captionpos=b]
+// Apply mutation to the offsprings
+if mod.MutRate > 0 {
+	offsprings.Mutate(mod.MutRate, pop.RNG)
+}
+
+for i := range offsprings {
+	for _, operator := range mod.ExtraOperators {
+		if operator.Probability > 0 {
+			if pop.RNG.Float64() < operator.Probability {
+				offsprings[i].ApplyExtraOperator(operator, pop.RNG)
+			}
+		}
+	}
+}
+\end{lstlisting} 
+
+As soon as the the genetic operators were implemented and tested, we proceeded to fully execute the genetic algorithm.
+In order to get some insights about the state of the population during the execution of the genetic algorithm, we logged the fitness and the number of neurons of the best chromosome, and the average fitness of the population after each generation. In Figure \ref{native}
+
+\begin{figure}[h!]
+		\centering
+    	\includegraphics[width=\linewidth]{assets/images/milestone1-native-chart.png}
+    	\caption{Evolution of the fitness as error predicting the validation dataset and the neural network size}
+    	\label{fig:native}
+\end{figure} 
+
+We noticed that the execution of the algorithm was taking too long so we used a profiler in order to study which areas of the code were taking most time. It ended up being the \textit{Go perceptron} logs generator. we disabled these logs and the execution time was dramatically increased from more than 30 minutes to around 2 minutes.
+
+Once we were happy about the results, we started to build a simple web interface as a proof of concept for the execution of the algorithm compiled into WebAssembly.
+
+
 Talk about the results and time in Wasm
 
