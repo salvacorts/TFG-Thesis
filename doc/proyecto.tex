@@ -57,13 +57,17 @@
 \usepackage[Lenny]{fncychap}
 \usepackage{color}
 
+\definecolor{brickred}{rgb}{0.8, 0.25, 0.33}
+\definecolor{oceanboatblue}{rgb}{0.0, 0.47, 0.75}
+
 \lstset{ % add your own preferences
+	breaklines=true,
     basicstyle=\footnotesize,
-    keywordstyle=\color{blue},
+    keywordstyle=\color{oceanboatblue},
     numbers=left,
     numbersep=5pt,
     showstringspaces=false, 
-    stringstyle=\color{green},
+    stringstyle=\color{brickred},
     tabsize=4,
     language=Golang % this is it !
 }
