@@ -23,7 +23,7 @@ The genetic operators of the genetic algorithm we have used  to optimize the neu
 \begin{itemize}
 	\item \textbf{Selection:} Roulette tournament where two chromosomes are randomly selected from the population to cross.
 	
-	\item \textbf{Evaluation:} Train a copy of the chromosome with the training dataset without Backpropagation. The fitness of the chromosome that will be returned by this operator will be the classification error obtained by predicting new samples from the validation dataset with the trained copy of the chromosome.
+	\item \textbf{Evaluation:} Train a copy of the chro\subsubsection*{\href{https://github.com/salvacorts/TFG-Parasitic-Metaheuristics/issues/20}{Issue \#20}: As an Administrator, I want to run a demo problem so that I can test the platform} mosome with the training dataset without Backpropagation. The fitness of the chromosome that will be returned by this operator will be the classification error obtained by predicting new samples from the validation dataset with the trained copy of the chromosome.
 	$$ Error = 1 - \frac{TP + TN}{TP + TN + FP + FN}  $$
 	
 	Where $TP = $ True Positives, $TN = $ True Negatives, $FP = $ False Positives, and $FN = $ False Negatives.
@@ -193,3 +193,101 @@ captionpos=b]
 go build main.go
 ./main
 \end{lstlisting} 
+
+
+\section{Centralized Distributed Evolutionary Algorithm}
+
+In this milestone we aimed to develop a distributed evolutionary algorithm with a client server architecture to solve our MLP problem developed in the previous milestone.
+
+\subsubsection*{\href{https://github.com/salvacorts/TFG-Parasitic-Metaheuristics/issues/9}{Issue \#9}: As a researcher, I want different systems to communicate between each others with a common solution representation so that all of them can work with it and share it.}
+
+Both clients and server need to communicate with each other to work together, to do so, we need to provide a common data representation that enables them to work and exchange chromosomes over the internet. 
+
+We chose Protocol Buffers as our serialization and data definition mechanism since, as we previously saw in chapter 3, it is a simple, fast and extensible solution that outperforms the most commonly used data representation techniques like XML or JSON, and supports many languages which makes it a really attractive alternative for future support for other languages apart from Go.
+
+Moreover, we decided to use \textit{gogoprotobuf} \cite{gogo}, a fork of Protocol Buffers for Golang that comes with important optimization and extra features. Several benchmarks \cite{gogo-bench} comparing this fork with the rest of serialization and deserialization solutions for Golang demonstrates that \textit{gogoprotobuf} is the best choice in terms of performance, correctness, and interoperability.
+
+In Listing \ref{lst:mlp-protobuf} we can find the protocol buffers representation for the Multilayer Perceptron we used in the previous milestone. Once this type is compiled into Golang, its usage slightly differs from a traditional Go type, therefore, we had to adapt all our mlp-related functions from \textit{go-perceptron-go} to work with this new type; including the training and prediction methods, as well as all the genetic operators.
+
+\begin{lstlisting}[
+caption={Protocl Buffers representation of the Multilayer Perceptron},
+label={lst:mlp-protobuf},
+captionpos=b]
+enum TransferFunc {
+    SIGMOIDAL = 0;
+}
+
+message NeuronUnit {
+    repeated double Weights = 1;
+    double Bias = 2;
+    double Lrate = 3;
+    double Value = 4;
+    double Delta = 5;
+}
+
+message NeuralLayer {
+    repeated NeuronUnit NeuronUnits = 1 [(gogoproto.nullable) = false];
+    int64 Length = 2;
+}
+
+message MultiLayerNetwork {
+    double LRate = 1;
+    repeated NeuralLayer NeuralLayers = 2 [(gogoproto.nullable) = false];
+    TransferFunc TFunc = 3;
+}
+\end{lstlisting} 
+
+In order to test that this new Protocol Buffers based type and the modified functions were behaving as expected, we used the same unit tests we were using for the genetic algorithm using \textit{go-perceptron-go} in the previous iteration to validate our new implementation. We achieved the same performance and results as on the previous milestone.
+
+\subsubsection*{\href{https://github.com/salvacorts/TFG-Parasitic-Metaheuristics/issues/21}{Issue \#21}: As a researcher, I want an interface for browser-based nodes communications so that using the distributed system is easier.}
+
+If two collaborating nodes want to communicate with each other, they will have to enable port-forwarding on their local gateways. Since this project aims to achieve minimal installation requirements, and most routers provided by ISPs does not provide any mechanism to open ports in the router from inside an application (e.g. UPnP \cite{wiki-upnp} is missing or deactivated in most cases) without the explicit intervention of the user for security reasons, we need to rely on a central server that will take the role of intermediaries between clients.
+
+We will base our design on the distributed pool-based genetic algorithm from JJ et al \cite{paper-pool-jj} where the central server maintains a pool of chromosomes that will be modified by the server and evaluated by the clients.
+
+Explain Pool Architecture with (selection?), threads and channels
+
+Explain gRPC vs REST from paper
+
+Explain problems to converge and solutions
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\section{Apendix: Testing and Continuous Integration}
