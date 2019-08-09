@@ -28,6 +28,8 @@
 \usepackage{subcaption}
 \usepackage{multirow, multicol} % For personas
 \usepackage{float}
+\usepackage{protobuf/lang}  % include language definition for protobuf
+%\usepackage{protobuf/style} % include custom style for proto declarations.
 \restylefloat{table} % for personas images
 
 \usepackage[table,xcdraw]{xcolor}
@@ -61,6 +63,7 @@
 \definecolor{oceanboatblue}{rgb}{0.0, 0.47, 0.75}
 
 \lstset{ % add your own preferences
+	basicstyle=\scriptsize,
 	breaklines=true,
     basicstyle=\footnotesize,
     keywordstyle=\color{oceanboatblue},
@@ -69,8 +72,10 @@
     showstringspaces=false, 
     stringstyle=\color{brickred},
     tabsize=4,
+    escapeinside=\`\`,
     language=Golang % this is it !
 }
+
 
 \begin{document}
 
