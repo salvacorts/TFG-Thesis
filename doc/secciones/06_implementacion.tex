@@ -1,5 +1,5 @@
 \chapter{Development follow up}
-In this chapter, we will follow development of each milestone. For each one, first, we will describe the issues involved. Then, we will describe the design decisions made, and finally, we will discuss interesting lessons and problems we have encountered in that iteration.
+In this chapter, we will follow the development of each milestone. For each one, first, we will describe the issues involved. Then, we will describe the design decisions made, and finally, we will discuss interesting lessons and problems we have encountered in that iteration.
 
 The Github repository used for the development of this project can be found at \href{https://github.com/salvacorts/TFG-Parasitic-Metaheuristics}{github.com/salvacorts/TFG-Parasitic-Metaheuristics}.
 
@@ -8,7 +8,7 @@ This milestone contained the following user story:
 
 \subsubsection*{\href{https://github.com/salvacorts/TFG-Parasitic-Metaheuristics/issues/20}{Issue \#20}: As an Administrator, I want to run a demo problem so that I can test the platform} 
 
-Fist of all, we needed a problem that can perform well in the platform. This problem will be used to test the platform as we develop it further.
+Fist of all, we needed a problem that could perform well in the platform. This problem will be used to test the platform as we develop it further.
 
 We chose a multilayer perceptron (MLP) trained with the \textit{Glass} and \textit{Cancer1a} datasets from \textit{proben1} benchmark \ref{proben1}; a set of benchmarks for neural network training algorithms.
 
@@ -23,14 +23,14 @@ The genetic operators of the genetic algorithm we have used  to optimize the neu
 \begin{itemize}
 	\item \textbf{Selection:} Roulette tournament where two chromosomes are randomly selected from the population to cross.
 	
-	\item \textbf{Evaluation:} Train a copy of the chro\subsubsection*{\href{https://github.com/salvacorts/TFG-Parasitic-Metaheuristics/issues/20}{Issue \#20}: As an Administrator, I want to run a demo problem so that I can test the platform} mosome with the training dataset without Backpropagation. The fitness of the chromosome that will be returned by this operator will be the classification error obtained by predicting new samples from the validation dataset with the trained copy of the chromosome.
+	\item \textbf{Evaluation:} Train a copy of the chromosome with the training dataset without Backpropagation. The fitness of the chromosome that will be returned by this operator will be the classification error obtained by predicting new samples from the validation dataset with the trained copy of the chromosome.
 	$$ Error = 1 - \frac{TP + TN}{TP + TN + FP + FN}  $$
 	
 	Where $TP = $ True Positives, $TN = $ True Negatives, $FP = $ False Positives, and $FN = $ False Negatives.
 	
 	\item \textbf{Mutation:} First, modify the learning rate of the network by adding a random number uniformly distributed in the range [-0.05, 0.05]. Then, with certain probability, for each neuron in each hidden layer (in our case there is just one hidden layer), add a random number in the range [-0.1, 0.1] following uniform distribution to all its weights.
 	
-	\item \textbf{Crossover:} Apply a multi-point crossover between two chormosomes where the neurons of both parents will be mixed resulting in two new offspring that will contain neurons from both parents. The learning rates of the two parents are swapped as well.
+	\item \textbf{Crossover:} Apply a multi-point crossover between two chormosomes where the neurons of both parents will be mixed resulting in two new offsprings that will contain neurons from both parents. The learning rates of the two parents are swapped as well.
 	
 	\item \textbf{Add Neuron:} Add a new randomly initialized neuron to the hidden layer that will be connected with the neurons in the following and previous layer. This operator performs incremental learning and attempts to address the problem of estimating the number of neurons to use in the hidden layer.
 	
@@ -41,7 +41,7 @@ The genetic operators of the genetic algorithm we have used  to optimize the neu
 	\item \textbf{Train:} This operator performs a local search by training the multi-layer perceptron represented in the chromosome with Backpropagation \cite{backpropagation} for a given number of epochs.
 \end{itemize}
 
-We have developed our evolutionary algorithm using the \textit{Go} language \cite{go}. Go, or Golang, is a is a statically typed and compiled open-source programming language that features a C-like syntax but that comes with garbage collection and built-in easy support for concurrent and distributed programming thanks to its \textit{goroutines} \cite{channels} and \textit{channels} \cite{channels}.
+We have developed our evolutionary algorithm using the \textit{Go} language \cite{go}. Go, or Golang, is a is a statically typed and compiled open-source programming language that features a C-like syntax but that includes garbage collection and easy support for concurrent and distributed programming thanks to its \textit{goroutines} \cite{channels} and \textit{channels} \cite{channels}.
 
 There are two main pre-existing libraries that we will use:
 
@@ -119,13 +119,13 @@ time="2019-07-18T17:51:53+02:00" level=info msg="Best fitness at generation 3: 2
     	\label{fig:native}
 \end{figure} 
 
-We noticed that the execution of the algorithm was taking too long so we used a profiler in order to study which areas of the code were taking most time. It ended up being the \textit{Go perceptron} logs generator. we disabled these logs and the execution time was dramatically reduced from more than 2 hours to around 2 minutes.
+We noticed that the execution of the algorithm was taking too long so we used a profiler in order to study which areas of the code were taking most of the time. It ended up being the \textit{Go perceptron} logs generator. we disabled these logs and the execution time was dramatically reduced from more than 2 hours to around 2 minutes.
 
-Once we were happy about the results, we started to build a simple web interface as a proof of concept for the execution of the algorithm compiled into WebAssembly. We started with a very simple webpage that executed the compiled webassembly and displayed the logs in the console from the developers tools of the browser. But we had two problems with this approach:
+Once we were pleased with the obtained results, we started to build a simple web interface as a proof of concept for the execution of the algorithm compiled into WebAssembly. We started with a very simple webpage that executed the compiled WebAssembly and displayed the logs in the console from the developers tools of the browser. But we had two problems with this approach:
 
-On the one hand, when the browser developers tools are open, WebAssembly is actually ran like a JavaScript in order to be able to debug it. So that, the execution time is considerably increased, losing the main advantage of and the reason of using WebAssembly.
+On the one hand, when the browser developers tools are open, WebAssembly is actually ran like a JavaScript program in order to be able to debug it. Therefore, the execution time is considerably increased, losing the main advantage of and the reason of using WebAssembly.
 
-As a solution, we added a HTML \textit{Div} to the webpage where we appended the logs from the program execution directly from go using a custom class (listing \ref{lst:weblogger1}) that implemented the \textit{io.Writer} interface. By doing so, we did not need the developer tools anymore, having direct visual feedback from the execution and good performance.
+As a solution, we added a HTML \textit{Div} to the webpage where we appended the logs from the program execution directly from Go using a custom class (listing \ref{lst:weblogger1}) that implemented the \textit{io.Writer} interface. By doing so, we did not need the developer tools anymore, having direct visual feedback from the execution and good performance.
 
 \begin{lstlisting}[
 caption={Weblogger class used to append logs to the webpage.},
@@ -148,7 +148,7 @@ func (cl WebLogger) Write(p []byte) (o int, err error) {
 }
 \end{lstlisting} 
 
-On the other hand, since we were running the webassembly instance directly from a script imported in the HTML page, the same thread that composes the webpage is the one that executes the program and therefore, since this is a computationally intensive tasks, the browser displayed the message from figure \ref{image:kill-task} on top of the webpage. Moreover, if the user changed to another tab, the execution was paused.
+On the other hand, since we were running the WebAssembly instance directly from a script imported in the HTML page, the same thread that composes the webpage is the one that executes the program and therefore, since this is a computationally intensive tasks, the browser displayed the message from figure \ref{image:kill-task} on top of the webpage. Moreover, if the user changed to another tab, the execution was paused.
 
 \begin{figure}[h!]
 		\centering
@@ -225,7 +225,12 @@ message NeuronUnit {
     double Value = 4;
     double Delta = 5;
 }
-
+\begin{figure}[h!]
+		\centering
+    	\includegraphics[width=\linewidth]{assets/images/web-milestone1.png}
+    	\caption{Final prototype of the webpage running the Go code for the genetic algorithm in webassembly.}
+    	\label{image:web-milestone1}
+\end{figure}
 message NeuralLayer {
     repeated NeuronUnit NeuronUnits = 1 [(gogoproto.nullable) = false];
     int64 Length = 2;
@@ -238,11 +243,11 @@ message MultiLayerNetwork {
 }
 \end{lstlisting} 
 
-In order to test that this new Protocol Buffers based type and the modified functions were behaving as expected, we used the same unit tests we were using for the genetic algorithm using \textit{go-perceptron-go} in the previous iteration to validate our new implementation. We achieved the same performance and results as on the previous milestone.
+In order to test that this new Protocol Buffers type and the modified functions were behaving as expected, we used the same unit tests we were using for the genetic algorithm using \textit{go-perceptron-go} in the previous iteration to validate our new implementation. We achieved the same performance and results as on the previous milestone.
 
 \subsubsection*{\href{https://github.com/salvacorts/TFG-Parasitic-Metaheuristics/issues/21}{Issue \#21}: As a researcher, I want an interface for browser-based nodes communications so that using the distributed system is easier.}
 
-If two collaborating nodes want to communicate with each other, they would have to enable port-forwarding on their local gateways. Since this project aims to achieve minimal installation requirements, and most routers provided by ISPs does not provide any mechanism to open ports in the router from inside an application (e.g. \textit{UPnP} \cite{wiki-upnp} is missing or deactivated in most cases) without the explicit intervention of the user for security reasons, we need to rely on a central server that will take the role of intermediaries between clients.
+If two collaborating nodes want to communicate with each other, they would have to enable port-forwarding on their local gateways. Since this project aims to achieve minimal installation requirements, and most routers provided by ISPs do not provide any mechanism to open ports in the router from inside an application (e.g. \textit{UPnP} \cite{wiki-upnp} is missing or deactivated in most cases) without the explicit intervention of the user for security reasons, we need to rely on a central server that will take the role of intermediaries between clients.
 
 We have based our design on the pool-based genetic algorithm from Merelo et al \cite{paper-pool-jj} where the central server maintains a pool of chromosomes that are mutated and crossed by the server and evaluated by the clients.
 
@@ -348,51 +353,40 @@ ok      github.com/plutov/benchmark-grpc-protobuf-vs-http-json  5.313s
         \caption{Performance of gRPC (blue) vs REST API (red). Less is better}
         \label{fig:grpc-vs-rest}
     \end{figure}
+    
+It is worth mentioning that as of August 11th, there is no current official support for gRPC on Golang Web Assembly although it is in process \cite{grpc-wasm-issue}. As a workaround, we are setting two listeners for the gRPC server: a \textit{tcp} listener for native clients that will support HTTP/2, and a \textit{Web Sockets} listener for Web Assembly clients that will work on top of HTTP 1.1. Still, we take advantage of the benefits of using Protocol Buffers over JSON.
 
-\paragraph*{Evaluated handler.} When the gRPC server gets back an individual from a client, it appends that individual into the evaluated channel which connects the \textit{Evaluate handler} thread with the \textit{Evaluated handler} thread which is in charge of appending the received individuals into the population. It is also responsible for checking if the received solution is better than the current best solution, or if the stopping criteria is met. In our case, the stopping criteria are either reaching a maximum number of evaluations or the best solution having a fitness of 0.0.
-
+\paragraph*{Evaluated handler.} When the gRPC server gets back an individual from a client, it appends that individual into the evaluated channel which connects the \textit{Evaluate handler} thread with the \textit{Evaluated handler} thread which is in charge of appending the received individuals into the population. It is also responsible for checking if the received solution is better than the best one so far, or if the stopping criteria is met. In our case, the stopping criteria are either reaching a maximum number of evaluations or the best solution having a fitness of 0.0.
 
 \paragraph*{}
-The resulting prototype for this milestone is a working distributed evolutionary algorithm that can be found at \href{github.com/salvacorts/TFG-Parasitic-Metaheuristics/tree/master/mlp-ea-centralized/common}{https://github.com/salvacorts/TFG-Parasitic-Metaheuristics/tree/master/mlp-ea-centralized/common}, and executed as follows:
+The resulting prototype for this milestone is a working distributed evolutionary algorithm that can be found at \href{github.com/salvacorts/TFG-Parasitic-Metaheuristics/tree/master/mlp-ea-centralized/common}{https://github.com/salvacorts/TFG-Parasitic-Metaheuristics/tree/master/mlp-ea-centralized/}, and executed as follows:
 
 \begin{itemize}
 	\item \textbf{Server.} Listens at 127.0.0.1:3117.
-\begin{lstlisting}
-go test -v ./tests/ -count 1 -timeout 1h -run TestTrainMLP
+\begin{lstlisting}[language=bash]
+cd native/server/
+go run server.go
 \end{lstlisting}
 
-	\item \textbf{Client.} Can be instanced multiple times by running the following command as many times as desired.
-\begin{lstlisting}
-go test -v ./tests/ -timeout 1h -run TestClient
+	\item \textbf{Native Client.} Can be instanced multiple times by running the following command as many times as desired.
+\begin{lstlisting}[language=bash]
+cd native/client/
+go run client.go
+\end{lstlisting}
+
+	\item \textbf{Web Client.} Can be instance in multiple tabs by running the instructions bellow and opening \href{127.0.0.1:8081}{127.0.0.1:8081} in a browser.
+\begin{lstlisting}[language=bash]
+fab build-web-mlp-wasm
+fab run-server-web-mlp
 \end{lstlisting}
 \end{itemize}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+\begin{figure}[h!]
+		\centering
+    	\includegraphics[width=\linewidth]{assets/images/web-milestone2.png}
+    	\caption{Final prototype of the webpage running the Go code that evaluates individuals from the server.}
+    	\label{image:web-milestone1}
+\end{figure}
 
 
 
