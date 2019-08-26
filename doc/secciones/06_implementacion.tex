@@ -225,12 +225,7 @@ message NeuronUnit {
     double Value = 4;
     double Delta = 5;
 }
-\begin{figure}[h!]
-		\centering
-    	\includegraphics[width=\linewidth]{assets/images/web-milestone1.png}
-    	\caption{Final prototype of the webpage running the Go code for the genetic algorithm in webassembly.}
-    	\label{image:web-milestone1}
-\end{figure}
+
 message NeuralLayer {
     repeated NeuronUnit NeuronUnits = 1 [(gogoproto.nullable) = false];
     int64 Length = 2;
@@ -385,17 +380,163 @@ fab run-server-web-mlp
 		\centering
     	\includegraphics[width=\linewidth]{assets/images/web-milestone2.png}
     	\caption{Final prototype of the webpage running the Go code that evaluates individuals from the server.}
-    	\label{image:web-milestone1}
+    	\label{image:web-milestone2}
 \end{figure}
 
+\section{Decentralized Distributed Evolutionary Algorithm}
+
+The objective for this milestone was to decentralized the implementation from the previous milestone as well as providing more metrics to better assess the execution of the algorithm in a cluster of nodes. This sprint contained the user stories described bellow.
+
+\subsubsection*{\href{https://github.com/salvacorts/TFG-Parasitic-Metaheuristics/issues/18}{Issue \#18}: As a researcher, I want an interface for native nodes communications so that using the distributed system is easier.}
+So far our algorithm was tightly coupled to our testing problem, so that, the first objective of this story was to decouple the problem from the algorithm itself.
+
+Since our RPC service was defined using the configuration fields for the MLP execution, and the \textit{MultiLayerNetwork} type from the MLP problem, we had to redefine the service messages, as in Listing \ref{lst:rpc_milestone3}, using an array of bytes as the payload for the genome and the problem description instead of using the problem specific types as in Listing \ref{lst:grpc-protobuf}.
+
+\begin{lstlisting}[
+language=protobuf3,
+caption={Modified gRPC service to be decoupled from the problem by using an array of bytes to define the genome of an Individual and the problem description. Changes with respect to the types of the previous iteration are highlighted}.,
+label={lst:rpc_milestone3},
+captionpos=b]
+message `\colorbox{yellow}{Individual}` {
+    string individualID = 2;
+    bool evaluated = 3;
+    double fitness = 4;
+    `\colorbox{yellow}{bytes genome = 5;}`
+}
+
+message ProblemDescription {
+    string clientID = 1;
+    `\colorbox{yellow}{bytes payload = 2;}`
+}
+
+service DistributedEA {
+    rpc GetProblemDescription(google.protobuf.Empty) returns (`\colorbox{yellow}{ProblemDescription}`) {}
+    rpc BorrowIndividual(google.protobuf.Empty) returns (`\colorbox{yellow}{Individual}`) {}
+    rpc ReturnIndividual(`\colorbox{yellow}{Individual}`) returns (google.protobuf.Empty) {}
+}
+\end{lstlisting}
+
+The implementation of this service had to be modified as well since we no longer had direct access to the actual representation of the genome nor the problem description. We solved this by using a similar approach as to abstract the actual genetic operators implementations from the algorithm: a delegate interface (Listing \ref{lst:delegate_interface}) to be implemented by the user to serialize and deserialize the genome of an Individual and the problem description.
+
+\begin{lstlisting}[
+caption={Delegate interface to be implemented by the user that enables the algorithm to serialize and deserialize the genome and problem description.},
+label={lst:delegate_interface},
+captionpos=b]
+type ServiceDelegate interface {
+	SerializeProblemDescription() []byte
+	DeserializeProblemDescription([]byte)
+	SerializeGenome(eaopt.Genome) []byte
+	DeserializeGenome([]byte) eaopt.Genome
+}
+\end{lstlisting}
+
+The implementation of this interface for the user should be trivial. For example, the \textit{DeserializeProblemDescription} and \textit{SerializeGenome} functions for the MLP problem looks as in Listing \ref{lst:mlp_delegate}
+
+\begin{lstlisting}[
+caption={Delegate interface implementation for the MLP problem.},
+label={lst:mlp_delegate},
+captionpos=b]
+// DeserializeProblemDescription sets mlp.Config from deserializing buff
+func (d DelegateImpl) DeserializeProblemDescription(buff []byte) {
+	desc := MLPDescription{}
+
+	err := desc.Unmarshal(buff)
+	if err != nil {
+		Log.Fatalf("Could not deserialize MLPDespription. %s", err.Error())
+	}
+
+	Config.Epochs = int(desc.Epochs)
+	Config.Folds = int(desc.Folds)
+	Config.Classes = desc.Classes
+
+	Config.TrainingSet, err, _ = utils.LoadPatternsFromCSV(desc.TrainDataset)
+	if err != nil {
+		Log.Fatalf("Could not Parse patterns from reterived CSV. %s", err.Error())
+	}
+}
+
+// SerializeGenome serializes a MLP to a []byte
+func (d DelegateImpl) SerializeGenome(genome eaopt.Genome) []byte {
+	mlp := genome.(*MultiLayerNetwork)
+
+	buff, err := mlp.Marshal()
+	if err != nil {
+		Log.Fatalf("Could not serialize MultiLayerNetwork. %s", err.Error())
+	}
+
+	return buff
+}
+\end{lstlisting}
+
+With these changes, we had a library to execute distributed genetic algorithms that does not depend on the problem description nor solution representation.
+
+\paragraph*{}
+The second and main objective of this story was to shift from a centralized network toward a peer-to-peer network design.
+All distributed systems needs from mechanisms to keep track of other nodes in the system; this is easily achievable in a centralized approach since all nodes need to know only about the central node that coordinates them, but it is much more complicated on decentralized networks since each node needs to maintain a list of alive nodes and look for failures on other nodes of the network by its own.
+
+We used a Gossip protocol to implement the membership and failure detection mechanism of our decentralized network. Gossip protocols spread information though a network in a similar way to how a gossip, or an infection, is spread in society. They are widely used in the industry to achieve this; an example of a successful product that makes use of a Gossip protocol to achieve the same goal as us is Amazon's Dynamo Database\cite{dynamo_paper}; a scalable and decentralized NoSQL database capable of serving more than 10 trillion requests per day and support above 20 million requests per second \cite{dynamo_web}.
+
+Specifically, the Gossip protocol we used to build our system is the SWIM membership protocol\cite{SWIM} by using the Go \textit{memberlist} library\cite{memberlist}. The SWIM protocol has two components that work as follows\cite{SWIM}:
+
+\paragraph*{Failure Detector.} In order to detect failing nodes in the system, a node $M_{i}$ from the cluster periodically sends a ping to a randomly selected node $M_{j}$ from its list of nodes. If $M_{j}$ does not answer back within a given timeout based on the round-trip time of the message, $M_i$ selects $k$ nodes from its list of nodes and requests each one to ping $M_j$. If $M_{j}$ answers back to any of the selected $k$ nodes, the ping response will be forwarded to $M_{i}$. At the end of the given protocol period ($T'$), $M_{i}$ checks whether an ping response was received or forwarded from $M_J$; if not, $M_{j}$ marked as \textit{Suspected} of failing in $M_{i}$'s members list.
+
+\begin{figure}[h!]
+		\centering
+    	\includegraphics[scale=0.25]{assets/images/swim_net.png}
+    	\caption{SWIM mechanism for node failure detection. $M_{i}$ request $k$ nodes from the cluster to ping $M_{j}$ and forward its response back after not receiving an response back to $M_{i}$'s original ping. \cite{SWIM}}
+    	\label{image:web-milestone2}
+\end{figure}
+
+Then, using the Dissemination Component, a message \textit{\{Suspect $M_{j}$: $M_{i}$ suspects $M_{j}$\}} is spread through the system and nodes that receive that message will mark $M_{j}$ as \textit{Suspected}. If a node $M_{l}$ that has marked $M_{j}$ as \textit{Suspected} does not receive an \textit{Alive} message about $M_{j}$ before a given timeout, $M_{l}$ will remove $M_{j}$ from its list of members declaring it as faulty and spread the message \textit{\{Confirm $M_{j}$: $M_{l}$ declares $M_{j}$ as faulty\}} thought the Dissemination Component.\cite{SWIM}
+
+\paragraph*{Dissemination Component.} Gossiping is done by piggybacking messages on the requests and responses from the Failure Detector component.
+
+From \cite{epidemics}, for a cluster of $n$ nodes, the relation between the expected number of infected members $x$ and time $t$, with a contact rate $\beta$ per time unit is obtained as equation \ref{eq:2}.
+\begin{equation}
+\label{eq:2}
+    \frac{dx}{dt} = \beta \cdot x \cdot (n - x)
+\end{equation}
+
+For SWIM, having $T'$ as time unit and the probability of contacting a node from another node's members list as $\beta$; the above equation leads to equation \ref{eq:3}.
+\begin{equation}
+\label{eq:3}
+   x = \frac{n}{1 + (n - 1)e^{-(2- \frac{1}{n})t}}
+\end{equation}
+
+Each message will be piggybacked at most $\lambda \cdot \log n$ times (where $\lambda$ is a given constant), since that message will be spread to $ x = \frac{n}{1 + (n - 1)e^{-(2-1/n)\lambda}} \ge n \cdot (1 - \frac{1}{n^{(2-1/n)\lambda-1}}) $ members after $\lambda \cdot \log n$ protocol periods. The least gossiped messages have higher priority.
+
+All in all, as the number of nodes in the cluster increases ($n \rightarrow \inf$), the number of nodes to contact, $x$, goes to $(n - n^{-(2\lambda - 2)})$\cite{SWIM}. So the parameter $\lambda$ enables the user to adjust the gossip protocol reliability; a smaller $\lambda$ leads to lower reliability but with lower bandwidth usage, whereas a higher $\lambda$ increases reliability at cost of bandwidth.
+
+\begin{figure}[h!]
+		\centering
+    	\includegraphics[scale=0.25]{assets/images/swim_chart.png}
+    	\caption{Message spead latency variation with cluster size. \cite{SWIM}}
+    	\label{image:web-milestone2}
+\end{figure}
+
+In our system, apart from using the SWIM protocol to maintain nodes membership, we used the Dissemination Component to spread newly found best individuals across the system so every node in the cluster knows the best individual found so far with eventual consistency as a way to increase the exploitation capabilities of the evolutionary algorithm. Also, with every \textit{Alive} message, metadata about the alive node is piggybacked containing information about the services it provides and the ports to access them (e.g. Port for the \textit{DistributedEA} RPC service).
+
+With these changes we got an abstraction of the underlying communications of the algorithm between peers so the user of the system does not need to worry about any membership or networking-related issue apart from knowing at least one node that will be used as a bootstrap to join a cluster that runs the evolutionary algorithm for a specific problem.
+
+
+\paragraph*{}
+\textbf{Migration Policy}
+The main mechanism between islands
+
+\paragraph*{}
+\textbf{Results and how to use}
+A library to execute distributed and decentralized genetic algorithms. that can be used with eaopt operators.
+Compilation and execution.
+
+\textbf{Image of system diagram}
+
+\textbf{Godoc docs automatically generated}
+
+
+\subsubsection*{\href{https://github.com/salvacorts/TFG-Parasitic-Metaheuristics/issues/19}{Issue \#19}: As an Administrator, I want to get metrics from the execution of problems so that I can assess how the system is performing.}
 
 
 
+\section{Appendix: Testing and Continuous Integration}
 
-
-
-
-
-
-
-\section{Apendix: Testing and Continuous Integration}
+Speak about unit tests, selenium IDE, and Travis to pass the tests. Also speak about fabric
