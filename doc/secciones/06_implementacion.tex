@@ -478,7 +478,7 @@ We used a Gossip protocol to implement the membership and failure detection mech
 
 Specifically, the Gossip protocol we used to build our system is the SWIM membership protocol\cite{SWIM} by using the Go \textit{memberlist} library\cite{memberlist}. The SWIM protocol has two components that work as follows\cite{SWIM}:
 
-\paragraph*{Failure Detector.} In order to detect failing nodes in the system, a node $M_{i}$ from the cluster periodically sends a ping to a randomly selected node $M_{j}$ from its list of nodes. If $M_{j}$ does not answer back within a given timeout based on the round-trip time of the message, $M_i$ selects $k$ nodes from its list of nodes and requests each one to ping $M_j$. If $M_{j}$ answers back to any of the selected $k$ nodes, the ping response will be forwarded to $M_{i}$. At the end of the given protocol period ($T'$), $M_{i}$ checks whether an ping response was received or forwarded from $M_J$; if not, $M_{j}$ marked as \textit{Suspected} of failing in $M_{i}$'s members list.
+\paragraph*{Failure Detector.} In order to detect failing nodes in the system, a node $M_{i}$ from the cluster periodically sends a ping to a randomly selected node $M_{j}$ from its list of nodes. If $M_{j}$ does not answer back within a given timeout based on the round-trip time of the message, $M_{i}$ selects $k$ nodes from its list of nodes and requests each one to ping $M_{j}$. If $M_{j}$ answers back to any of the selected $k$ nodes, the ping response will be forwarded to $M_{i}$. At the end of the given protocol period ($T'$), $M_{i}$ checks whether an ping response was received or forwarded from $M_{j}$; if not, $M_{j}$ is marked as \textit{Suspected} of failing in $M_{i}$'s members list.
 
 \begin{figure}[h!]
 		\centering
@@ -487,7 +487,7 @@ Specifically, the Gossip protocol we used to build our system is the SWIM member
     	\label{image:web-milestone2}
 \end{figure}
 
-Then, using the Dissemination Component, a message \textit{\{Suspect $M_{j}$: $M_{i}$ suspects $M_{j}$\}} is spread through the system and nodes that receive that message will mark $M_{j}$ as \textit{Suspected}. If a node $M_{l}$ that has marked $M_{j}$ as \textit{Suspected} does not receive an \textit{Alive} message about $M_{j}$ before a given timeout, $M_{l}$ will remove $M_{j}$ from its list of members declaring it as faulty and spread the message \textit{\{Confirm $M_{j}$: $M_{l}$ declares $M_{j}$ as faulty\}} thought the Dissemination Component.\cite{SWIM}
+Then, using the Dissemination Component, a message \textit{\{Suspect $N_{j}$: $M_{i}$ suspects $M_{j}$\}} is spread through the system and nodes that receive that message will mark $M_{j}$ as \textit{Suspected}. If a node $M_{l}$ that has marked $M_{j}$ as \textit{Suspected} does not receive an \textit{Alive} message about $M_{j}$ before a given timeout, $M_{l}$ will remove $M_{j}$ from its list of members declaring it as faulty and spread the message \textit{\{Confirm $M_{j}$: $M_{l}$ declares $M_{j}$ as faulty\}} thought the Dissemination Component.\cite{SWIM}
 
 \paragraph*{Dissemination Component.} Gossiping is done by piggybacking messages on the requests and responses from the Failure Detector component.
 
@@ -516,12 +516,50 @@ All in all, as the number of nodes in the cluster increases ($n \rightarrow \inf
 
 In our system, apart from using the SWIM protocol to maintain nodes membership, we used the Dissemination Component to spread newly found best individuals across the system so every node in the cluster knows the best individual found so far with eventual consistency as a way to increase the exploitation capabilities of the evolutionary algorithm. Also, with every \textit{Alive} message, metadata about the alive node is piggybacked containing information about the services it provides and the ports to access them (e.g. Port for the \textit{DistributedEA} RPC service).
 
-With these changes we got an abstraction of the underlying communications of the algorithm between peers so the user of the system does not need to worry about any membership or networking-related issue apart from knowing at least one node that will be used as a bootstrap to join a cluster that runs the evolutionary algorithm for a specific problem.
+With these changes we got an abstraction on the underlying communications of the algorithm between peers so the user of the system does not need to worry about any membership or networking-related issue apart from knowing at least one node that will be used as a bootstrap to join a cluster that runs the evolutionary algorithm for a specific problem.
 
 
 \paragraph*{}
-\textbf{Migration Policy}
-The main mechanism between islands
+Once we had a decentralized mechanism for nodes discovery and nodes failure on the cluster, the third and last objective of this user story was ready to be addressed; a mechanism to execute an evolutionary algorithm between multiple peers.
+
+We decided to use a hybrid pool-island model where the pool of chromosomes that each node in the cluster maintains is an independent island whose chromosomes are evaluated by the clients developed in previous iterations and that periodically some of these chromosomes in the pool migrate to another island. An illustration of this model can be seen on Figure \ref{fig:system_milestone3}
+
+\begin{figure}[h!]
+		\centering
+    	\includegraphics[scale=0.25]{assets/images/swim_chart.png}
+    	\caption{Message spead latency variation with cluster size. \cite{SWIM}}
+    	\label{image:web-milestone2}
+\end{figure}
+
+To implement this migration mechanism, a new method was added to the existing gRPC service (Listing \ref{lst:rpc_migrate}). Periodically, after a given time, a node $M_{i}$ randomly selects a node $M{j}$ from its list of members on the cluster. Then, $M_{i}$ selects $N$ chromosomes from the population after performing a $k$ chromosomes tournament to select each migrating chromosome (as for the selection of chromosomes to cross and mutate).
+
+This island model enables the algorithm to increase its exploration capabilities by having multiple populations that potentially evolve towards different search spaces. 
+
+The migration mechanism, on the other hand, aims to maintain the overall exploitation capabilities of the algorithm on promising search spaces by sharing individuals between islands and thus having the opportunity to explore similar search spaces.. 
+
+This exploitation can be configured by the user by increasing the value of parameter $k$ of the selection method so individuals with better fitness are more likely to be selected for migration, whereas decreasing $k$ leads to a more randomized selection. In other words if $k$ equals to the size of the population, $N$ copies of the best individual in the population will migrate whereas if $k = 1$, the selection is purely random.
+
+Moreover, to increase exploitation, once a migration is received, the migrating individuals will try to replace the worst $N$ individuals on the receiving population. An individual $I$ from the population  will be replaced by an individual $I'$ from the migration only if the fitness of $I'$ is better and the fitness of $I$.
+
+\begin{lstlisting}[
+language=protobuf3,
+caption={New gRPC method to migrate a batch of individuals from one node to another.},
+label={lst:rpc_migrate},
+captionpos=b]
+message IndividualsBatch {
+    repeated Individual individuals = 1 [(gogoproto.nullable) = false];
+}
+
+service DistributedEA {
+    /* Communication for Clients */
+    ...
+
+    /* Communication with other Servers */
+    rpc MigrateIndividuals(IndividualsBatch) returns (google.protobuf.Empty) {}
+}
+\end{lstlisting}
+
+This concludes the design of our highly configurable distributed and decentralized evolutionary algorithm which aims to maintain a good balance between exploitation and exploration while maximizing scalability, fault-resilience and network-partitioning tolerance, with a peer-to-peer and asynchronous design.
 
 \paragraph*{}
 \textbf{Results and how to use}
