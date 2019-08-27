@@ -353,7 +353,13 @@ It is worth mentioning that as of August 11th, there is no current official supp
 
 \paragraph*{Evaluated handler.} When the gRPC server gets back an individual from a client, it appends that individual into the evaluated channel which connects the \textit{Evaluate handler} thread with the \textit{Evaluated handler} thread which is in charge of appending the received individuals into the population. It is also responsible for checking if the received solution is better than the best one so far, or if the stopping criteria is met. In our case, the stopping criteria are either reaching a maximum number of evaluations or the best solution having a fitness of 0.0.
 
-\paragraph*{}
+\begin{figure}[h!]
+		\centering
+    	\includegraphics[scale=0.5]{assets/images/tfg-net-milestone2.png}
+    	\caption{Representation of server maintaining a pool whose chromosomes are evaluated by several clients asynchronously.}
+    	\label{fig:tfg-net-milestone2}
+\end{figure}
+
 The resulting prototype for this milestone is a working distributed evolutionary algorithm that can be found at \href{github.com/salvacorts/TFG-Parasitic-Metaheuristics/tree/master/mlp-ea-centralized/common}{https://github.com/salvacorts/TFG-Parasitic-Metaheuristics/tree/master/mlp-ea-centralized/}, and executed as follows:
 
 \begin{itemize}
@@ -369,7 +375,7 @@ cd native/client/
 go run client.go
 \end{lstlisting}
 
-	\item \textbf{Web Client.} Can be instance in multiple tabs by running the instructions bellow and opening \href{127.0.0.1:8081}{127.0.0.1:8081} in a browser.
+	\item \textbf{Web Client.} Can be instanced in multiple tabs by running the instructions bellow and opening \href{127.0.0.1:8081}{127.0.0.1:8081} in a browser.
 \begin{lstlisting}[language=bash]
 fab build-web-mlp-wasm
 fab run-server-web-mlp
@@ -522,13 +528,13 @@ With these changes we got an abstraction on the underlying communications of the
 \paragraph*{}
 Once we had a decentralized mechanism for nodes discovery and nodes failure on the cluster, the third and last objective of this user story was ready to be addressed; a mechanism to execute an evolutionary algorithm between multiple peers.
 
-We decided to use a hybrid pool-island model where the pool of chromosomes that each node in the cluster maintains is an independent island whose chromosomes are evaluated by the clients developed in previous iterations and that periodically some of these chromosomes in the pool migrate to another island. An illustration of this model can be seen on Figure \ref{fig:system_milestone3}
+We decided to use a hybrid pool-island model (Figure \ref{fig:tfg-net-abstraction}) where the pool of chromosomes that each node in the cluster maintains is an independent island whose chromosomes are evaluated by the clients developed in previous iterations and that periodically some of these chromosomes in the pool migrate to another island.
 
 \begin{figure}[h!]
 		\centering
-    	\includegraphics[scale=0.25]{assets/images/swim_chart.png}
-    	\caption{Message spead latency variation with cluster size. \cite{SWIM}}
-    	\label{image:web-milestone2}
+    	\includegraphics[width=\linewidth]{assets/images/tfg-net-abstraction.png}
+    	\caption{Cluster running the hybrid pool-island model. Abstraction of Figure \ref{fig:tfg-net} by using this  peer-to-peer design.}
+    	\label{fig:tfg-net-abstraction}
 \end{figure}
 
 To implement this migration mechanism, a new method was added to the existing gRPC service (Listing \ref{lst:rpc_migrate}). Periodically, after a given time, a node $M_{i}$ randomly selects a node $M{j}$ from its list of members on the cluster. Then, $M_{i}$ selects $N$ chromosomes from the population after performing a $k$ chromosomes tournament to select each migrating chromosome (as for the selection of chromosomes to cross and mutate).
@@ -559,16 +565,34 @@ service DistributedEA {
 }
 \end{lstlisting}
 
-This concludes the design of our highly configurable distributed and decentralized evolutionary algorithm which aims to maintain a good balance between exploitation and exploration while maximizing scalability, fault-resilience and network-partitioning tolerance, with a peer-to-peer and asynchronous design.
+This concludes the design of our highly configurable distributed and decentralized evolutionary algorithm which aims to maintain a good balance between exploitation and exploration while maximizing scalability, fault-resilience and network-partitioning tolerance, with a peer-to-peer and asynchronous design. An example of system running this algorithm can be seen on Figure \ref{fig:tfg-net} which, from the user point of view, it is abstracted into Figure \ref{fig:tfg-net-abstraction} by the design proposed on this project.
 
-\paragraph*{}
-\textbf{Results and how to use}
-A library to execute distributed and decentralized genetic algorithms. that can be used with eaopt operators.
-Compilation and execution.
+\begin{figure}[h!]
+		\centering
+    	\includegraphics[width=\linewidth]{assets/images/tfg-net.png}
+    	\caption{Example of a network of heterogeneous nodes running the evolutionary algorithm.}
+    	\label{fig:tfg-net}
+\end{figure}
 
-\textbf{Image of system diagram}
+The final prototype for this milestone, and for this project, can be found at \href{github.com/salvacorts/TFG-Parasitic-Metaheuristics/tree/master/mlp-ea-centralized/common}{https://github.com/salvacorts/TFG-Parasitic-Metaheuristics/tree/master/mlp-ea-decentralized/}, and executed as follows:
 
-\textbf{Godoc docs automatically generated}
+\begin{itemize}
+	\item \textbf{Server.} Needs form at least one bootstrap peer to join a cluster. If any is specified a new cluster is created; other peers can join that cluster by using the address of the server as bootstrap node.
+\begin{lstlisting}[language=bash]
+cd native/server/
+go run server.go -grpcPort <grpc_port> -clusterPort <gossip_port> -clusterBoostrap <peer1_addr:peer1_gossip_port,peer2_addr:peer2_gossip_port>
+\end{lstlisting}
+
+	\item \textbf{Native Client.} Can be instanced multiple times by running the following command as many times as desired.
+\begin{lstlisting}[language=bash]
+cd native/client/
+go run client.go -server <server_address:grpc_port>
+\end{lstlisting}
+
+	\item \textbf{Web Client.} Each server exposes an HTTP server that can be opened into several tabs to run a client on that server.
+\end{itemize}
+
+Golang automatically generates online source code documentation for public source repositories. The documentation for this tool can be found at \href{godoc.org/github.com/salvacorts/TFG-Parasitic-Metaheuristics/mlp-ea-decentralized/common/ga}{https://godoc.org/github.com/salvacorts/TFG-Parasitic-Metaheuristics/mlp-ea-decentralized/common/ga}.
 
 
 \subsubsection*{\href{https://github.com/salvacorts/TFG-Parasitic-Metaheuristics/issues/19}{Issue \#19}: As an Administrator, I want to get metrics from the execution of problems so that I can assess how the system is performing.}
@@ -578,3 +602,4 @@ Compilation and execution.
 \section{Appendix: Testing and Continuous Integration}
 
 Speak about unit tests, selenium IDE, and Travis to pass the tests. Also speak about fabric
+Also speak about Go Doc
