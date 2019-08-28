@@ -570,7 +570,7 @@ This concludes the design of our highly configurable distributed and decentraliz
 \begin{figure}[h!]
 		\centering
     	\includegraphics[width=\linewidth]{assets/images/tfg-net.png}
-    	\caption{Example of a network of heterogeneous nodes running the evolutionary algorithm.}
+    	\caption{Example of a network made of heterogeneous nodes running the evolutionary algorithm.}
     	\label{fig:tfg-net}
 \end{figure}
 
@@ -597,6 +597,69 @@ Golang automatically generates online source code documentation for public sourc
 
 \subsubsection*{\href{https://github.com/salvacorts/TFG-Parasitic-Metaheuristics/issues/19}{Issue \#19}: As an Administrator, I want to get metrics from the execution of problems so that I can assess how the system is performing.}
 
+For advance users and system administrator running this algorithm, it could be interesting to easily collect metrics apart from the very basic ones exposed to the average non-tech savvy user (average fitness, fitness of the best individual and evaluations carried out so far).
+
+\begin{figure}[h!]
+		\centering
+    	\includegraphics[width=\linewidth]{assets/images/prometheus-architecture.png}
+    	\caption{Prometheus monitoring system used on this project. Based on illustration from \cite{prom-image}}
+    	\label{fig:prometheus-ecosystem}
+\end{figure}
+
+In order to provide these advance metrics, we have instrumented our project with Prometheus\cite{prometheus}; an open source library for systems and applications monitoring, and alerts triggering. In order to setup a Prometheus monitoring ecosystem as on Figure \ref{fig:prometheus-ecosystem}, three main components are needed:
+
+\begin{itemize}
+	\item \textbf{Client library.} Creates a HTTP endpoint that serves the metrics from the instrumented application to a Prometheus server. Table \ref{tab:metrics} provides a list of the exposed metrics about the execution of the algorithm provided by our tool. Apart from these metrics, the Go client library also provides several metrics about Go's runtime (e.g. number of goroutines) and basic Linux process information (e.g. CPU usage).
+	
+\begin{table}[h]
+\begin{tabular}{|l|l|}
+\hline
+\multicolumn{1}{|c|}{\textbf{Metric}}         & \multicolumn{1}{c|}{\textbf{Description}}  \\ \hline
+best\_fitness                                 & Fitness of the best solution found so far  \\ \hline
+\textit{island\_total\_evaluations}           & Number of evaluations carried out          \\ \hline
+\textit{island\_total\_migrations\_outgoing}  & Number of migrations carried out           \\ \hline
+\textit{island\_total\_migrations\_incomming} & Number of migrations received              \\ \hline
+\textit{island\_total\_broadcasts\_outgoing}  & Number of broadcast individuals            \\ \hline
+\textit{island\_total\_broadcast\_incomming}  & Number of received broadcast individuals   \\ \hline
+\textit{island\_population\_size}             & Size of the population                     \\ \hline
+\textit{population\_avg\_fitness}             & Population average fitness                 \\ \hline
+\textit{population\_std\_fitness}             & Population fitness standard deviation      \\ \hline
+\textit{cluster\_size}                        & Size of the node members list              \\ \hline
+\end{tabular}
+\caption{System metrics exposed by the Prometheus Client library on a HTTP endpoint.}
+\label{tab:metrics}
+\end{table}
+	
+	\item \textbf{Prometheus server.} Scrapes and stores data from clients exposing metrics. It also provided an HTTP API to query for metrics and show basic graphs. The query language used for retrieve this data is called PromQL and its documentation can be found at \cite{promQL}. In order to be able to retrieve metrics from clients, the HTTP metrics endpoint of each client must be provided to the Prometheus server on its configuration file; Listing \ref{lst:prom_srv_conf} shows an example configuration.
+	
+\begin{lstlisting}[
+label={lst:prom_srv_conf},
+caption={Content of configuration file for a Prometheus server monitoring a client that exposes its metrics at \textit{127.0.0.1:2222/metrics}. This configuration file is usually located at \textit{/etc/prometheus/prometheus.yml}},
+captionpos=b]
+scrape_configs:
+  - job_name: DistributedEA
+    scrape_interval: 10s
+    static_configs:
+    - targets:
+      - 127.0.0.1:2222
+\end{lstlisting}
+	
+	\item \textbf{Visualization tool.} Lastly but probably the most important, the tool that will be used to visualize the collected data in real-time. Even tough there are many visualization tools for Prometheus metrics and Prometheus servers provides a basic visualization tool out of the box, Grafana has gained lot of attention due its easy installation and high customization capabilities. It also has an active community that share visualization dashboards for common metrics that makes the learning-curve of a new user less steeper. Figures \ref{fig:grafana-1}, and \ref{fig:grafana-2} show and example of Grafana dashboards monitoring a Node running our algorithm in the cluster.
+\end{itemize}
+
+\begin{figure}[h!]
+		\centering
+    	\includegraphics[width=\linewidth]{assets/images/grafana-1.png}
+    	\caption{Grafana dashboard for monitoring algorithm execution}
+    	\label{fig:grafana-1}
+\end{figure}
+
+\begin{figure}[h!]
+		\centering
+    	\includegraphics[width=\linewidth]{assets/images/grafana-2.png}
+    	\caption{Grafana dashboard for monitoring Go's runtime}
+    	\label{fig:grafana-2}
+\end{figure}
 
 
 \section{Appendix: Testing and Continuous Integration}
