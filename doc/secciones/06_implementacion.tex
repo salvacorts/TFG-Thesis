@@ -661,8 +661,62 @@ scrape_configs:
     	\label{fig:grafana-2}
 \end{figure}
 
-
+\newpage
 \section{Appendix: Testing and Continuous Integration}
+Untested software leads to low-quality and usually faulty software. In this section we will briefly talk about how we tested the software developed on this project and how we continuously integrated it.
 
-Speak about unit tests, selenium IDE, and Travis to pass the tests. Also speak about fabric
-Also speak about Go Doc
+Although testing takes time, it pays off with every important change on a software code base since these changes can be done faster due to having the intended functionality of the software automatically tested thus avoiding to test every software requirement by hand to ensure changes have not affected other functionality apart from those intended. All in all, despite the initial tests implementation time needed, testing code actually saves time and make your code much more maintainable and safe.
+
+We have used Unit Testing to test the code base of this project ensuring all functions leads to the desired outcome. Golang comes with great support for Unit Tests. Go automatically detect tests in the source code by defining a tests as a function inside a file whose name ends with \textit{\_test.go}, that takes an argument of type \textit{*testing.T} and whose name starts with the \textit{Test} keyword followed by the uppercase name of the test. Listing \ref{lst:test_example} illustrates this with an example.
+
+\begin{lstlisting}[
+caption={Example of testing on Go. The \textit{Add} function is on file \textit{add.go} while its test is on file \textit{add\_test.go}},
+label={lst:test_example},
+captionpos=b]
+
+// On file add.go 
+func Add(a, b int) int {
+	return a + b
+}
+
+
+// On file add_test.go
+import "testing"
+
+func TestAdd(t *testing.T) {
+	a, b := 1, 2
+	expected := 3
+	
+	result := Add(a, b)
+	
+	if result != expected {
+		t.Errorf("Wrong result on Add function. Expected: %d - Got: %d", expected, result)	
+	}
+}
+\end{lstlisting}
+
+All tests can be ran from just one command line instruction using the \textit{go test} tool as on Listing \ref{lst:execute_tests}.
+
+\begin{lstlisting}[language=bash,
+caption={Run all tests on this directory and its sub-directories (\textit{./...}) 4 times, with a timeout of 20 minutes.},
+label={lst:execute_tests},
+captionpos=b]
+# On the same directory as add.go and add_test.go
+go test -v ./... -timeout 20m -count 4
+
+# Output
+=== RUN   TestAdd
+--- PASS: TestAdd (0.00s)
+=== RUN   TestAdd
+--- PASS: TestAdd (0.00s)
+=== RUN   TestAdd
+--- PASS: TestAdd (0.00s)
+=== RUN   TestAdd
+--- PASS: TestAdd (0.00s)
+PASS
+ok  	_/home/salva/Documents	0.001s
+\end{lstlisting}
+
+The code of the prototype developed for the last milestone comes with 100 unit test that covers the implementations for the decentralized system, the genetic algorithm and its operators, and the multilayer perceptron.
+
+We have used Travis CI for the continuous integration of our project. Every time a commit is pushed to a branch on the Github repository with an open pull request to master, Travis executes all tests every time a new Pull Request is created in order to confirm that all modifications pass the tests. This is indeed needed given the fact that this is an open source project and everyone is welcome and encouraged to contribute.
