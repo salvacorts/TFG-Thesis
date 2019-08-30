@@ -4,12 +4,31 @@ In this chapter we will iterate through each of our initial objectives, analyzin
 
 \section{Objective 1. Maximize engagement of contributors}
 
-\paragraph*{Ease of installation}
-\paragraph*{Browser-based node}
-\paragraph*{Visual feedback of execution on browser-based clients} 
+We will use our personas from Section 4.1 to understand how would they use this tool and to check if their goals are met. The most difficult part of their job would be to get their hands on a client to collaborate on a problem they like. The top priority future work on this project would be building an online catalog where collaborators can easily look for problem they find interesting. Still let's assume our collaborators already have access to a client.
 
-Final discussion about the achievement of this objective
+On the one hand, Aleix Vargas would probably use just the browser version of the client since he is not willing to install anything on his computer. He would only need to enter a valid URL on his browser and automatically start collaborating without having to mess around with download times, installation dependencies or execution parameters. 
 
+The downside of browser client is that it might require to repeat these steps every time Aleix closes his browser and wants to start collaborating again. Nevertheless, as a work around, Aleix can pin the tab running the client or even setting it as his home-page so whenever the browser is started, the client is executed.
+
+On the other hand, a collaborator more confident with their tech skills, like Ana Castillo, would rather use the native client in order to collaborate in projects they like. Installation however would require compilation for the architecture and operative system of the user. Fortunately, compiling Go code is really easy and precompiled binaries can be provided for different environments. Moreover, binaries for different combinations of operative systems and architectures can be compiled from the same machine by using command line instructions like on Listing \ref{lst:cross-compilation}.
+
+\begin{lstlisting}[language=bash,
+caption={Cross-compilation of client for different operative systems and architectures from the same Linux machine.},
+label={lst:cross-compilation},
+captionpos=b]
+# Compile for Windows 64bits
+GOOS=windows GOARCH=amd64 go build -o client.exe client.go
+
+# Compile for Mac OS 64bits
+GOOS=darwin GOARCH=amd64 go build -o client client.go
+
+# Compile for Linux 32bits
+GOOS=linux GOARCH=386 go build -o client client.go
+\end{lstlisting} 
+
+The main reason to use this kind of client is achieving higher performance than the browser-based client, and a less intrusive experience since the client can run in the background. Furthermore, the client can be scheduled to start running at log in so Ana do not need to start the client manually after she logs out on her computer.
+
+An even more advance use case scenario would be a collaborator that wants to collaborate by creating a node and joining an already existing cluster as a new node to start collaborating on a problem they are interested in. The first step would be download the source code for a given problem, building it, and running the executable to an already existing node in the cluster. In order to be able to receive migrations and requests from users, he will need to manually open ports on his router and forward incoming connection to his machine via port-forwarding.
 
 
 \section{Objective 2. Fault-tolerant design capable of working with heterogeneous and ephemeral nodes}
@@ -19,6 +38,7 @@ Where am I in the CAP theorem?
 \paragraph*{Heterogeneous Nodes}
 \begin{itemize}
 	\item Multi-Platform Code - list of supported go architectures and WASM
+	\item Slower nodes do not relatize other nodes since individuals are evaluated asynchronously.
 \end{itemize}
 
 \paragraph*{Fault-tolerance}
