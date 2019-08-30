@@ -2,7 +2,7 @@
 
 In this chapter we will iterate through each of our initial objectives, analyzing their accomplishment and the obtained results.
 
-\section{Objective 1. Maximize engagement of contributors}
+\section{Objective 1. Maximize engagement of collaborators}
 
 We will use our personas from Section 4.1 to understand how would they use this tool and to check if their goals are met. The most difficult part of their job would be to get their hands on a client to collaborate on a problem they like. The top priority future work on this project would be building an online catalog where collaborators can easily look for problem they find interesting. Still let's assume our collaborators already have access to a client.
 
@@ -30,8 +30,70 @@ The main reason to use this kind of client is achieving higher performance than 
 
 An even more advance use case scenario would be a collaborator that wants to collaborate by creating a node and joining an already existing cluster as a new node to start collaborating on a problem they are interested in. The first step would be download the source code for a given problem, building it, and running the executable to an already existing node in the cluster. In order to be able to receive migrations and requests from users, he will need to manually open ports on his router and forward incoming connection to his machine via port-forwarding.
 
+All in all, for different types of user, given their tech skills and their objectives; this project provides solutions that do not differ much in terms of their implementations.
 
 \section{Objective 2. Fault-tolerant design capable of working with heterogeneous and ephemeral nodes}
+
+As states in the previous section, Go is supported on many architectures and operative system. Implementation is usually architecture-agnostic which makes it a great language when one of the requirements of the final product is to support heterogeneous systems. Our implementation can be executed even on embedded systems which opens many opportunities with the currently increasing development of Internet of Things devices. A complete list of architectures and operative systems supported by Go can be found at \cite{go-architectures}.
+
+Given the fact that we have built a collaborative system where we do not control the computation capabilities of the collaborating nodes, it is really important to be able to deal with a heterogeneous system where slower nodes can limit the performance of faster ones. This risk is minimized on our system using an asynchronous communications approach. 
+
+On the one hand, clients evaluate individuals from the pool asynchronously thus a slower client cannot cause blocking on another client. On the other hand, migration is performed between islands from different nodes in a similar non-blocking approach where a separate thread from the main algorithm execution sends individuals to another node that handles the request on a separate thread from the main algorithm thread.
+
+The only, but avoidable, temporal blocking situation of a client can happen due to a misconfiguration of the size of the population or the selection operator. If the population is too small, the time it takes to complete an iteration of the evolutionary algorithm over the individuals of an island can be superior to the time it takes to evaluate and return the modified individuals and therefore the next iteration of the algorithm will need to block until there are enough individuals in the population to apply the selection operator again. 
+
+\begin{lstlisting}[
+caption={Main loop of the evolutionary algorithm. If \textit{pool.NCandidates} (Line 6 and 9) equals to the size of the population, it can lead to a temporal blocking situation of the algorithm.},
+label={lst:cross-compilation}, captionpos=b]
+for pool.evaluations < pool.MaxEvaluations {
+    var offsprings []eaopt.Individual
+
+    // At least nOffsprings shold be available in the population
+    // tu run this operator
+    pool.popSemaphore.Acquire(pool.NCandidates)
+
+    // take here randomly from population
+    offsprings = pool.selection(4, pool.NCandidates)
+    offsprings = pool.crossover(offsprings)
+    offsprings = pool.mutate(offsprings)
+
+    // Apply extra operators
+    for i := range offsprings {
+        for _, op := range pool.ExtraOperators {
+            if pool.Rnd.Float64() <= op.Probability {
+                offsprings[i].Genome = op.Operator(offsprings[i].Genome, pool.Rnd)
+                offsprings[i].Evaluated = false
+            }
+        }
+    }
+
+    // Append non evaluated offspings to the channel and
+    // Remove them from the population
+    for i := range offsprings {
+        if !offsprings[i].Evaluated {
+            pool.population.Remove(offsprings[i])
+            pool.evaluationChannel <- offsprings[i]
+        } else {
+            pool.popSemaphore.Release(1)
+        }
+    }
+}
+\end{lstlisting} 
+
+On the other hand, even if the population is big enough to avoid the situation described above, if the selection operator is configured to perform a tournament with the same amount of individuals as in the population (i.e. the parameter $k$ of the selection operator equals to the size of the population), the algorithm will block until all clients return the evaluated individuals that have been modified in the previous iteration of the algorithm.
+
+Fault-tolerance on a distributed system is another big challenge when working with ephemeral nodes that you do not control and are likely to stop working without previous notice nor troubleshooting options. Whereas by using a decentralized approach we achieve high reliability avoiding single point of failures on our system, there are other challenges to be addressed.
+
+One the one hand, all nodes in the system must be able to reliably detect other faulty nodes to avoid expending time trying to communicate with them. This is achieved on Project\_Name by using a gossip protocol that detects node-failures and spread that information on a bounded amount of time and with low bandwidth usage.
+
+\textbf{Node Failure experiment here - How much time does it take to detect a node failure depending on the number of nodes?}
+
+On the other hand, on a hypothetical scenario where nodes do not share the best solutions they find, if the node that has the best individual so far within the entire system fails, that solution will be lost and it is very unlikely to be recover. By using the migration mechanism periodically and gossiping every individual that replaces the best one known so far on a node, our proposed design aims to avoid this scenario with eventual consistency.
+
+\textbf{Gossiping experiment here - How much time does it take to every (and just other node) node to know about the best solution found depending on the number of nodes?}
+
+
+
 
 Where am I in the CAP theorem?
 
