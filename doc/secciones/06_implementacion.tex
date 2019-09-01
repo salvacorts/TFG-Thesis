@@ -10,13 +10,13 @@ This milestone contained the following user story:
 
 Fist of all, we needed a problem that could perform well in the platform. This problem will be used to test the platform as we develop it further.
 
-We chose a multilayer perceptron (MLP) trained with the \textit{Glass} and \textit{Cancer1a} datasets from \textit{proben1} benchmark \ref{proben1}; a set of benchmarks for neural network training algorithms.
+We chose a multilayer perceptron (MLP) trained with the \textit{Glass} and \textit{Cancer1a} datasets from \textit{proben1} benchmark \cite{proben1}; a set of benchmarks for neural network training algorithms.
 
 The \textit{Glass} dataset is made of 214 samples of glass where each one contains the percent content of 8 different chemical elements, its refractive index, and the type of glass (class attribute). A model that can predict the kind of glass from new samples, can be useful in criminal forensics.
 
 \textit{Cancer1a} is made of 699 samples of breast cancer. Each one contains a sample identification number, 9 attributes about the cell that the sample measures, and the class of cancerous cell: either benign or malignant.
 
-There are two main reasons to have chosen a multilayer perceptron to develop and demo the platform. On the one hand, its fitness function takes more time than the average latency of communication between nodes in the platform. On the other hand, we have previous experience \ref{gprop} with this problem and we are familiar with some useful genetic operators we can apply.
+There are two main reasons to have chosen a multilayer perceptron to develop and demo the platform. On the one hand, its fitness function takes more time than the average latency of communication between nodes in the platform. On the other hand, we have previous experience \cite{gprop} with this problem and we are familiar with some useful genetic operators we can apply.
 
 The genetic operators of the genetic algorithm we have used  to optimize the neural network are the same ones proposed by P. A. Castillo et al in G-Prop \cite{gprop}:
 
@@ -41,9 +41,9 @@ The genetic operators of the genetic algorithm we have used  to optimize the neu
 	\item \textbf{Train:} This operator performs a local search by training the multi-layer perceptron represented in the chromosome with Backpropagation \cite{backpropagation} for a given number of epochs.
 \end{itemize}
 
-We have developed our evolutionary algorithm using the \textit{Go} language \cite{go}. Go, or Golang, is a is a statically typed and compiled open-source programming language that features a C-like syntax but that includes garbage collection and easy support for concurrent and distributed programming thanks to its \textit{goroutines} \cite{channels} and \textit{channels} \cite{channels}.
+We have developed our evolutionary algorithm using \textit{Go} \cite{go}. Go, or Golang, is a statically typed and compiled open-source programming language that features a C-like syntax but that includes garbage collection and easy support for concurrent and distributed programming thanks to its \textit{goroutines} \cite{channels} and \textit{channels} \cite{channels}.
 
-There are two main pre-existing libraries that we will use:
+There are two main pre-existing libraries that we will use to develop this project:
 
 \begin{itemize}
 	\item \textbf{Go Perceptron:} A single and multilayered perceptron classifier trained with Backpropagation \cite{go-perceptron-go}.
@@ -53,7 +53,7 @@ There are two main pre-existing libraries that we will use:
 \subsubsection*{Implementation}
 As deliverable prototype for the end of this milestone, we wanted to have the same solution running on both native and browser environments. Typically we would have had to write the same code twice; in Go for native and in Java Script for the browser, but thanks to WebAssembly, we could share the same code base between both native and browsers with just minor changes.
 
-The \textit{Go perceptron} library fitted our necessities well so we didn't need to modify it internally at the very first moment. On the other hand, we had to modify \textit{eopt} so we could execute other genetic operators over the population apart from the mutation, evaluation and crossover operators.
+The \textit{Go Perceptron} library fitted our necessities well so we didn't need to modify it internally at the very first moment. On the other hand, we had to modify \textit{eaopt} so we could execute other genetic operators over the population apart from the mutation, evaluation and crossover operators.
 
 In order to use eaopt, first the developer needs to configure the number of generations, the population size and the genetic model to use in the genetic algorithm. The model defines how the algorithm evolves the population with the selection, mutation and crossover operators; in our particular case, we decided to use a generational model.
 
@@ -100,7 +100,7 @@ for i := range offsprings {
 \end{lstlisting} 
 
 As soon as the the genetic operators were implemented and unit tested, we proceeded to fully execute the genetic algorithm.
-In order to get some insights about the state of the population during the execution of the genetic algorithm, we logged the fitness and the number of neurons of the best chromosome, and the average fitness of the population after each generation. In Figure \ref{native} we can see how the average and best fitness, as well as the number of neurons of the best solution evolves through the execution of the algorithm.
+In order to get some insights about the state of the population during the execution of the genetic algorithm, we logged the fitness and the number of neurons of the best chromosome, and the average fitness of the population after each generation. In Figure \ref{fig:native} we can see how the average and best fitness, as well as the number of neurons of the best solution evolves through the execution of the algorithm.
 
 \begin{lstlisting}[
 caption={Some execution logs.},
@@ -123,7 +123,7 @@ We noticed that the execution of the algorithm was taking too long so we used a 
 
 Once we were pleased with the obtained results, we started to build a simple web interface as a proof of concept for the execution of the algorithm compiled into WebAssembly. We started with a very simple webpage that executed the compiled WebAssembly and displayed the logs in the console from the developers tools of the browser. But we had two problems with this approach:
 
-On the one hand, when the browser developers tools are open, WebAssembly is actually ran like a JavaScript program in order to be able to debug it. Therefore, the execution time is considerably increased, losing the main advantage of and the reason of using WebAssembly.
+On the one hand, to see the logs from the algorithm, we had to open the console from the browser developers tools. When these tools are opened, WebAssembly is actually ran like a JavaScript program for debugging purposes. Therefore, the execution time is considerably increased, losing the main advantage of and the reason of using WebAssembly.
 
 As a solution, we added a HTML \textit{Div} to the webpage where we appended the logs from the program execution directly from Go using a custom class (listing \ref{lst:weblogger1}) that implemented the \textit{io.Writer} interface. By doing so, we did not need the developer tools anymore, having direct visual feedback from the execution and good performance.
 
@@ -148,25 +148,25 @@ func (cl WebLogger) Write(p []byte) (o int, err error) {
 }
 \end{lstlisting} 
 
-On the other hand, since we were running the WebAssembly instance directly from a script imported in the HTML page, the same thread that composes the webpage is the one that executes the program and therefore, since this is a computationally intensive tasks, the browser displayed the message from figure \ref{image:kill-task} on top of the webpage. Moreover, if the user changed to another tab, the execution was paused.
+On the other hand, since we were running the WebAssembly instance directly from a script imported in the HTML page, the same thread that composes the webpage is the one that executes the program and therefore, since this is a computationally intensive tasks, the browser displayed the message from Figure \ref{fig:kill-task} on top of the webpage. Moreover, if the user changed to another tab, the execution was paused.
 
 \begin{figure}[h!]
 		\centering
     	\includegraphics[width=\linewidth]{assets/images/browser-warning.png}
     	\caption{Browser warning about computationally intensive tasks}
-    	\label{image:kill-task}
+    	\label{fig:kill-task}
 \end{figure} 
 
-We solved this by using a webworker \cite{webworker}; a script that runs in a separate thread in the background. The problem with webworkers is that they do not have access to the DOM, instead, they have to communicate with another thread that is being executed in the browser's main thread. It is a simple but limited API where the main thread launches the worker and sets an event listener for incoming messages. Then the worker posts a new message as a string that is delivered to the main thread. Figure \ref{logging-system} illustrates the webworker behaviour we used for the logging system.
+We solved this by using a webworker \cite{webworker}; a script that runs on a separate thread in the background. The problem with webworkers is that they do not have access to the DOM, instead, they have to communicate with another thread that is being executed in the browser's main thread. It is a simple but limited API where the main thread launches the worker and sets an event listener for incoming messages. Then the worker posts a new message as a string that is delivered to the main thread. Figure \ref{fig:logging-system} illustrates the webworker behaviour we used for the logging system.
 
 \begin{figure}[h!]
 		\centering
     	\includegraphics[width=\linewidth]{assets/images/logging-system.png}
-    	\caption{The \textit{main.js} script loaded in the main HTML document, starts a webworker that will start the webassembly runtime and load the compiled Go program into it. The logs generated in Go are received by the main thread through the webworker API and these are appended into the web DOM}
-    	\label{image:logging-system}
+    	\caption{The \textit{main.js} script loaded in the main HTML document, starts a webworker that will start the WebAssembly runtime and load the compiled Go program into it. The logs generated in Go are received by the main thread through the webworker API and these are appended into the web DOM}
+    	\label{fig:logging-system}
 \end{figure} 
 
-Since now we had a background job doing the most demanding work, the main thread was free to compose the webpage so we added two line charts using \textit{chart JS} to display live information about the execution. In order to parse the information needed to compose the charts from the logs, we changed their format to JSON in order to deserialize them to Java Script objects and access their information faster and easier.
+Since now we had a background job doing the most demanding work, the main thread was free to compose the webpage so we added two line charts using \textit{Chart.js} \cite{chartjs} to display live information about the overall state of the execution. In order to parse the information needed to compose the charts from the logs, we changed their format to JSON in order to deserialize them to Java Script objects and access their information faster and easier.
 
 This concludes the first milestone in the project. The deliverable prototype is the resulting web interface for the genetic algortihm that trains the multi layer perceptron in WebAssembly. It can be found at \href{https://salvacorts.github.io/TFG-Parasitic-Metaheuristics/mlp-ea/web/src/}{salvacorts.github.io/TFG-Parasitic-Metaheuristics/mlp-ea/web/src/} and looks as follows.
 
@@ -177,7 +177,7 @@ This concludes the first milestone in the project. The deliverable prototype is 
     	\label{image:web-milestone1}
 \end{figure}
 
-The genetic algorithm implementation can be found in the main repository in directory \textit{mlp-ea/common}. The web source can be found in \textit{mlp-ea/web}. The source of the program to execute it natively can be found in \textit{mlp-ea/native} and can be directly run as in Listing \ref{lst:run} or compiled and run as in \ref{lst:build-run}.
+The genetic algorithm implementation can be found on the project's GitHub repository at directory \textit{mlp-ea/common}. The web source can be found at \textit{mlp-ea/web}. The source of the program to execute it natively can be found at \textit{mlp-ea/native} and can be directly run as in Listing \ref{lst:run}, compiled and run as in \ref{lst:build-run}, or executed on a browser as on \ref{lst:run-web} at \href{127.0.0.1:8081}{127.0.0.1:8081}.
 
 \begin{lstlisting}[
 caption={Run native program},
@@ -194,20 +194,26 @@ go build main.go
 ./main
 \end{lstlisting} 
 
+\begin{lstlisting}[language=bash, label={lst:run-web},
+captionpos=b, caption={Build and serve webpage}]
+fab build-web-mlp-wasm
+fab run-server-web-mlp
+\end{lstlisting}
+
 
 \section{Centralized Distributed Evolutionary Algorithm}
 
 In this milestone we aimed to develop a distributed evolutionary algorithm with a client server architecture to solve our MLP problem developed in the previous milestone.
 
-\subsubsection*{\href{https://github.com/salvacorts/TFG-Parasitic-Metaheuristics/issues/9}{Issue \#9}: As a researcher, I want different systems to communicate between each others with a common solution representation so that all of them can work with it and share it.}
+\subsubsection*{\href{https://github.com/salvacorts/TFG-Parasitic-Metaheuristics/issues/9}{Issue \#9}: As a researcher, I want different systems to communicate between each others with a common solution representation so all of them can work with it and share it.}
 
 Both clients and server need to communicate with each other to work together, to do so, we need to provide a common data representation that enables them to work and exchange chromosomes over the internet. 
 
-We chose Protocol Buffers as our serialization and data definition mechanism since, as we previously saw in chapter 3, it is a simple, fast and extensible solution that outperforms the most commonly used data representation techniques like XML or JSON, and supports many languages which makes it a really attractive alternative for future support for other languages apart from Go.
+We chose Protocol Buffers as our serialization and data definition mechanism since, as we previously saw in chapter 3, it is a simple, fast and extensible solution that outperforms the most commonly used data representation solutions like XML or JSON, and supports many languages which makes it a really attractive alternative for future support for other languages apart from Go.
 
 Moreover, we decided to use \textit{gogoprotobuf} \cite{gogo}, a fork of Protocol Buffers for Golang that comes with important optimization and extra features. Several benchmarks \cite{gogo-bench} comparing this fork with the rest of serialization and deserialization solutions for Golang demonstrates that \textit{gogoprotobuf} is the best choice in terms of performance, correctness, and interoperability.
 
-In Listing \ref{lst:mlp-protobuf} we can find the protocol buffers representation for the Multilayer Perceptron we used in the previous milestone. Once this type is compiled into Golang, its usage slightly differs from a traditional Go type, therefore, we had to adapt all our mlp-related functions from \textit{go-perceptron-go} to work with this new type; including the training and prediction methods, as well as all the genetic operators.
+In Listing \ref{lst:mlp-protobuf} we can find the protocol buffers representation for the Multilayer Perceptron we used in the previous milestone. Once this type is compiled into Golang, its usage slightly differs from a traditional Go type, therefore, we had to adapt all our mlp-related functions from \textit{Go Perceptron} to work with this new type; including the training and prediction methods, as well as all the genetic operators.
 
 \begin{lstlisting}[
 language=protobuf2,
@@ -238,11 +244,11 @@ message MultiLayerNetwork {
 }
 \end{lstlisting} 
 
-In order to test that this new Protocol Buffers type and the modified functions were behaving as expected, we used the same unit tests we were using for the genetic algorithm using \textit{go-perceptron-go} in the previous iteration to validate our new implementation. We achieved the same performance and results as on the previous milestone.
+In order to test that this new Protocol Buffers type and the modified functions were behaving as expected, we used the same unit tests we were using for the genetic algorithm from the previous iteration to validate our new implementation. We achieved the similar performance and results as on the previous milestone.
 
 \subsubsection*{\href{https://github.com/salvacorts/TFG-Parasitic-Metaheuristics/issues/21}{Issue \#21}: As a researcher, I want an interface for browser-based nodes communications so that using the distributed system is easier.}
 
-If two collaborating nodes want to communicate with each other, they would have to enable port-forwarding on their local gateways. Since this project aims to achieve minimal installation requirements, and most routers provided by ISPs do not provide any mechanism to open ports in the router from inside an application (e.g. \textit{UPnP} \cite{wiki-upnp} is missing or deactivated in most cases) without the explicit intervention of the user for security reasons, we need to rely on a central server that will take the role of intermediaries between clients.
+If two collaborating nodes want to communicate with each other, they would have to enable port-forwarding on their local gateways. Since this project aims to achieve minimal installation requirements, and most routers provided by ISPs do not provide any mechanism to open ports in the router from inside an application (e.g. \textit{UPnP} \cite{wiki-upnp} is missing or deactivated in most cases) without the explicit intervention of the user for security reasons, we need to rely on a central server that will take the role of intermediary.
 
 We have based our design on the pool-based genetic algorithm from Merelo et al \cite{paper-pool-jj} where the central server maintains a pool of chromosomes that are mutated and crossed by the server and evaluated by the clients.
 
@@ -292,9 +298,9 @@ service DistributedEA {
 }
 \end{lstlisting}
 
-On the one hand, gRPC services are defined with protocol buffers which made it easier for us to implement this service given our previous design decisions. It also reduces the latency between peers since, as stated on previous sections, the serialization and deserialization times and sizes for Protocol Buffers are much lower than for JSON.
+\textit{gRPC} services are defined with protocol buffers which made it easier for us to implement this service given our previous design decisions. It also reduces the latency between peers since, as stated on previous sections, the serialization and deserialization times and sizes for Protocol Buffers are much lower than for JSON.
 
-On the other hand, gRPC uses HTTP/2, an evolution of HTTP 1.1, that provides request multiplexing and header compression. In order to demonstrate its capabilities, we have modified an Open Source benchmark \cite{rest-vs-grpc-bench} written in Go that compares the performance of gRPC vs REST by requesting and serving the same object multiple times. The original version of this benchmark served a small object made of just a couple of small fields. In order to better fit our scenario, we have modified this object (Listing \ref{lst:bench-struct}) to have a payload made of an array of 64 bit floats and 10000 elements.
+Moreover, gRPC uses HTTP/2, an evolution of HTTP 1.1, that provides request multiplexing and header compression. In order to demonstrate its capabilities, we have modified an Open Source benchmark \cite{rest-vs-grpc-bench} written in Go that compares the performance of gRPC vs REST by requesting and serving the same object multiple times. The original version of this benchmark served a small object made of just a couple of really small fields. In order to better fit our scenario, we have modified this object (Listing \ref{lst:bench-struct}) to have a payload made of an array of 64 bit floats and 10000 elements.
 
 \begin{lstlisting}[
 caption={Response object used for the benchmark},
@@ -349,7 +355,7 @@ ok      github.com/plutov/benchmark-grpc-protobuf-vs-http-json  5.313s
         \label{fig:grpc-vs-rest}
     \end{figure}
     
-It is worth mentioning that as of August 11th, there is no current official support for gRPC on Golang Web Assembly although it is in process \cite{grpc-wasm-issue}. As a workaround, we are setting two listeners for the gRPC server: a \textit{tcp} listener for native clients that will support HTTP/2, and a \textit{Web Sockets} listener for Web Assembly clients that will work on top of HTTP 1.1. Still, we take advantage of the benefits of using Protocol Buffers over JSON.
+It is worth mentioning that as of August 11th, there is no current official support for gRPC on Golang Web Assembly although it is in process \cite{grpc-wasm-issue}. As a workaround, we are setting two listeners for the gRPC server: a \textit{tcp} listener for native clients that will support HTTP/2, and a \textit{Web Sockets} listener for Web Assembly clients that will work on top of HTTP 1.1. Still, we take advantage of the benefits of using Protocol Buffers instead of JSON.
 
 \paragraph*{Evaluated handler.} When the gRPC server gets back an individual from a client, it appends that individual into the evaluated channel which connects the \textit{Evaluate handler} thread with the \textit{Evaluated handler} thread which is in charge of appending the received individuals into the population. It is also responsible for checking if the received solution is better than the best one so far, or if the stopping criteria is met. In our case, the stopping criteria are either reaching a maximum number of evaluations or the best solution having a fitness of 0.0.
 
@@ -391,7 +397,7 @@ fab run-server-web-mlp
 
 \section{Decentralized Distributed Evolutionary Algorithm}
 
-The objective for this milestone was to decentralized the implementation from the previous milestone as well as providing more metrics to better assess the execution of the algorithm in a cluster of nodes. This sprint contained the user stories described bellow.
+The objective for this milestone was to decentralize the implementation from the previous milestone as well as providing more metrics to better assess the execution of the algorithm in a cluster of nodes. This sprint contained the user stories described bellow.
 
 \subsubsection*{\href{https://github.com/salvacorts/TFG-Parasitic-Metaheuristics/issues/18}{Issue \#18}: As a researcher, I want an interface for native nodes communications so that using the distributed system is easier.}
 So far our algorithm was tightly coupled to our testing problem, so that, the first objective of this story was to decouple the problem from the algorithm itself.
@@ -484,7 +490,7 @@ We used a Gossip protocol to implement the membership and failure detection mech
 
 Specifically, the Gossip protocol we used to build our system is the SWIM membership protocol\cite{SWIM} by using the Go \textit{memberlist} library\cite{memberlist}. The SWIM protocol has two components that work as follows\cite{SWIM}:
 
-\paragraph*{Failure Detector.} In order to detect failing nodes in the system, a node $M_{i}$ from the cluster periodically sends a ping to a randomly selected node $M_{j}$ from its list of nodes. If $M_{j}$ does not answer back within a given timeout based on the round-trip time of the message, $M_{i}$ selects $k$ nodes from its list of nodes and requests each one to ping $M_{j}$. If $M_{j}$ answers back to any of the selected $k$ nodes, the ping response will be forwarded to $M_{i}$. At the end of the given protocol period ($T'$), $M_{i}$ checks whether an ping response was received or forwarded from $M_{j}$; if not, $M_{j}$ is marked as \textit{Suspected} of failing in $M_{i}$'s members list.
+\paragraph*{Failure Detector.} In order to detect failing nodes in the system, a node $M_{i}$ from the cluster periodically sends a ping to a randomly selected node $M_{j}$ from its list of nodes. If $M_{j}$ does not answer back before a given timeout based on the round-trip time of the message, $M_{i}$ selects $k$ nodes from its list of nodes and requests each one to ping $M_{j}$. If $M_{j}$ answers back to any of the selected $k$ nodes, the ping response will be forwarded to $M_{i}$. At the end of a given protocol period ($T'$), $M_{i}$ checks whether a ping response was received or forwarded from $M_{j}$; if no response was obtained, $M_{j}$ is marked as \textit{Suspected} of failing in $M_{i}$'s members list.
 
 \begin{figure}[h!]
 		\centering
@@ -509,7 +515,7 @@ For SWIM, having $T'$ as time unit and the probability of contacting a node from
    x = \frac{n}{1 + (n - 1)e^{-(2- \frac{1}{n})t}}
 \end{equation}
 
-Each message will be piggybacked at most $\lambda \cdot \log n$ times (where $\lambda$ is a given constant), since that message will be spread to $ x = \frac{n}{1 + (n - 1)e^{-(2-1/n)\lambda}} \ge n \cdot (1 - \frac{1}{n^{(2-1/n)\lambda-1}}) $ members after $\lambda \cdot \log n$ protocol periods. The least gossiped messages have higher priority.
+Each message will be piggybacked at most $\lambda \cdot \log n$ times (where $\lambda$ is an adjustable constant) since that message will be spread to $ x = \frac{n}{1 + (n - 1)e^{-(2-1/n)\lambda}} \ge n \cdot (1 - \frac{1}{n^{(2-1/n)\lambda-1}}) $ members after $\lambda \cdot \log n$ protocol periods. The least gossiped messages have higher priority.
 
 All in all, as the number of nodes in the cluster increases ($n \rightarrow \inf$), the number of nodes to contact, $x$, goes to $(n - n^{-(2\lambda - 2)})$\cite{SWIM}. So the parameter $\lambda$ enables the user to adjust the gossip protocol reliability; a smaller $\lambda$ leads to lower reliability but with lower bandwidth usage, whereas a higher $\lambda$ increases reliability at cost of bandwidth.
 
@@ -528,7 +534,7 @@ With these changes we got an abstraction on the underlying communications of the
 \paragraph*{}
 Once we had a decentralized mechanism for nodes discovery and nodes failure on the cluster, the third and last objective of this user story was ready to be addressed; a mechanism to execute an evolutionary algorithm between multiple peers.
 
-We decided to use a hybrid pool-island model (Figure \ref{fig:tfg-net-abstraction}) where the pool of chromosomes that each node in the cluster maintains is an independent island whose chromosomes are evaluated by the clients developed in previous iterations and that periodically some of these chromosomes in the pool migrate to another island.
+We decided to use a hybrid pool-island model (Figure \ref{fig:tfg-net-abstraction}) where the pool of chromosomes that each node in the cluster maintains is an independent island whose chromosomes are evaluated by the clients developed in the previous iteration and that periodically some of these chromosomes in the pool migrate to another island.
 
 \begin{figure}[h!]
 		\centering
@@ -541,7 +547,7 @@ To implement this migration mechanism, a new method was added to the existing gR
 
 This island model enables the algorithm to increase its exploration capabilities by having multiple populations that potentially evolve towards different search spaces. 
 
-The migration mechanism, on the other hand, aims to maintain the overall exploitation capabilities of the algorithm on promising search spaces by sharing individuals between islands and thus having the opportunity to explore similar search spaces.. 
+The migration mechanism, on the other hand, aims to maintain the overall exploitation capabilities of the algorithm on promising search spaces by sharing promising individuals between islands and thus having the opportunity to explore similar search spaces.. 
 
 This exploitation can be configured by the user by increasing the value of parameter $k$ of the selection method so individuals with better fitness are more likely to be selected for migration, whereas decreasing $k$ leads to a more randomized selection. In other words if $k$ equals to the size of the population, $N$ copies of the best individual in the population will migrate whereas if $k = 1$, the selection is purely random.
 
@@ -565,7 +571,7 @@ service DistributedEA {
 }
 \end{lstlisting}
 
-This concludes the design of our highly configurable distributed and decentralized evolutionary algorithm which aims to maintain a good balance between exploitation and exploration while maximizing scalability, fault-resilience and network-partitioning tolerance, with a peer-to-peer and asynchronous design. An example of system running this algorithm can be seen on Figure \ref{fig:tfg-net} which, from the user point of view, it is abstracted into Figure \ref{fig:tfg-net-abstraction} by the design proposed on this project.
+This concludes the design of our highly configurable distributed and decentralized evolutionary algorithm which aims to maintain a good balance between exploitation and exploration while maximizing scalability, and fault-tolerance, with a peer-to-peer and asynchronous design. An example of system running this algorithm can be seen on Figure \ref{fig:tfg-net} which, from the user point of view, it is abstracted into Figure \ref{fig:tfg-net-abstraction} by the design proposed on this project.
 
 \begin{figure}[h!]
 		\centering
@@ -589,11 +595,8 @@ cd native/client/
 go run client.go -server <server_address:grpc_port>
 \end{lstlisting}
 
-	\item \textbf{Web Client.} Each server exposes an HTTP server that can be opened into several tabs to run a client on that server.
+	\item \textbf{Web Client.} Each server exposes a HTTP server that can be opened into several tabs to run a client on that server.
 \end{itemize}
-
-Golang automatically generates online source code documentation for public source repositories. The documentation for this tool can be found at \href{godoc.org/github.com/salvacorts/TFG-Parasitic-Metaheuristics/mlp-ea-decentralized/common/ga}{https://godoc.org/github.com/salvacorts/TFG-Parasitic-Metaheuristics/mlp-ea-decentralized/common/ga}.
-
 
 \subsubsection*{\href{https://github.com/salvacorts/TFG-Parasitic-Metaheuristics/issues/19}{Issue \#19}: As an Administrator, I want to get metrics from the execution of problems so that I can assess how the system is performing.}
 
@@ -611,6 +614,11 @@ In order to provide these advance metrics, we have instrumented our project with
 \begin{itemize}
 	\item \textbf{Client library.} Creates a HTTP endpoint that serves the metrics from the instrumented application to a Prometheus server. Table \ref{tab:metrics} provides a list of the exposed metrics about the execution of the algorithm provided by our tool. Apart from these metrics, the Go client library also provides several metrics about Go's runtime (e.g. number of goroutines) and basic Linux process information (e.g. CPU usage).
 	
+	\item \textbf{Prometheus server.} Scrapes and stores data from clients exposing metrics. It also provided an HTTP API to query for metrics and show basic graphs. The query language used for retrieve this data is called PromQL and its documentation can be found at \cite{promQL}. In order to be able to retrieve metrics from clients, the HTTP metrics endpoint of each client must be provided to the Prometheus server on its configuration file; Listing \ref{lst:prom_srv_conf} shows an example configuration.
+	
+	\item \textbf{Visualization tool.} Lastly but probably the most important, the tool that will be used to visualize the collected data in real-time. Even tough there are many visualization tools for Prometheus metrics and Prometheus servers provides a basic visualization tool out of the box, Grafana has gained lot of attention due its easy installation and high customization capabilities. It also has an active community that share visualization dashboards for common metrics that makes the learning-curve of a new user less steeper. Figures \ref{fig:grafana-1}, and \ref{fig:grafana-2} show and example of Grafana dashboards monitoring a Node running our algorithm in the cluster.
+\end{itemize}
+
 \begin{table}[h]
 \begin{tabular}{|l|l|}
 \hline
@@ -629,9 +637,7 @@ best\_fitness                                 & Fitness of the best solution fou
 \caption{System metrics exposed by the Prometheus Client library on a HTTP endpoint.}
 \label{tab:metrics}
 \end{table}
-	
-	\item \textbf{Prometheus server.} Scrapes and stores data from clients exposing metrics. It also provided an HTTP API to query for metrics and show basic graphs. The query language used for retrieve this data is called PromQL and its documentation can be found at \cite{promQL}. In order to be able to retrieve metrics from clients, the HTTP metrics endpoint of each client must be provided to the Prometheus server on its configuration file; Listing \ref{lst:prom_srv_conf} shows an example configuration.
-	
+
 \begin{lstlisting}[
 label={lst:prom_srv_conf},
 caption={Content of configuration file for a Prometheus server monitoring a client that exposes its metrics at \textit{127.0.0.1:2222/metrics}. This configuration file is usually located at \textit{/etc/prometheus/prometheus.yml}},
@@ -643,9 +649,6 @@ scrape_configs:
     - targets:
       - 127.0.0.1:2222
 \end{lstlisting}
-	
-	\item \textbf{Visualization tool.} Lastly but probably the most important, the tool that will be used to visualize the collected data in real-time. Even tough there are many visualization tools for Prometheus metrics and Prometheus servers provides a basic visualization tool out of the box, Grafana has gained lot of attention due its easy installation and high customization capabilities. It also has an active community that share visualization dashboards for common metrics that makes the learning-curve of a new user less steeper. Figures \ref{fig:grafana-1}, and \ref{fig:grafana-2} show and example of Grafana dashboards monitoring a Node running our algorithm in the cluster.
-\end{itemize}
 
 \begin{figure}[h!]
 		\centering
@@ -723,7 +726,9 @@ We have used Travis CI for the continuous integration of our project. Every time
 
 \begin{figure}[h!]
 		\centering
-    	\includegraphics[scale=0.4]{assets/images/travis_example.png}
+    	\includegraphics[scale=0.35]{assets/images/travis_example.png}
     	\caption{Failing tests on a branch with an open pull request to master. It modifies a function of the system causing it to fail.}
     	\label{fig:travis}
 \end{figure}
+
+Documentation for the library developed on this project is also continuously integrated thanks to Golang automatically generating online source code documentation for public source repositories. The documentation for this tool can be found at \href{godoc.org/github.com/salvacorts/TFG-Parasitic-Metaheuristics/mlp-ea-decentralized/common/ga}{https://godoc.org/github.com/salvacorts/TFG-Parasitic-Metaheuristics/mlp-ea-decentralized/common/ga}.

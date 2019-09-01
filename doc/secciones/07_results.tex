@@ -4,7 +4,7 @@ In this chapter we will iterate through each of our initial objectives, analyzin
 
 \section{Objective 1. Maximize engagement of collaborators}
 
-We will use our personas from Section 4.1 to understand how would they use this tool and to check if their goals are met. The most difficult part of their job would be to get their hands on a client to collaborate on a problem they like. The top priority future work on this project would be building an online catalog where collaborators can easily look for problem they find interesting. Still let's assume our collaborators already have access to a client.
+We will use our Personas from Section 4.1 to understand how would they use this tool and to check if their goals are met. The most difficult part of their job would be to get their hands on a client to collaborate on a problem they like. The top priority future work on this project would be building an online catalog where collaborators can easily look for problem they find interesting. Still let's assume our collaborators already have access to a client.
 
 On the one hand, Aleix Vargas would probably use just the browser version of the client since he is not willing to install anything on his computer. He would only need to enter a valid URL on his browser and automatically start collaborating without having to mess around with download times, installation dependencies or execution parameters. 
 
@@ -28,9 +28,9 @@ GOOS=linux GOARCH=386 go build -o client client.go
 
 The main reason to use this kind of client is achieving higher performance than the browser-based client, and a less intrusive experience since the client can run in the background. Furthermore, the client can be scheduled to start running at log in so Ana do not need to start the client manually after she logs out on her computer.
 
-An even more advance use case scenario would be a collaborator that wants to collaborate by creating a node and joining an already existing cluster as a new node to start collaborating on a problem they are interested in. The first step would be download the source code for a given problem, building it, and running the executable to an already existing node in the cluster. In order to be able to receive migrations and requests from users, he will need to manually open ports on his router and forward incoming connection to his machine via port-forwarding.
+An even more advance use case scenario would be a collaborator that wants to collaborate by creating a node and joining an already existing cluster as a new node to start collaborating on a problem they are interested in. The first step would be download the source code of a node for a given problem, building it, and running the executable, setting an already existing node in the cluster as bootstrapping node. In order to be able to receive migrations and requests from users, he will need to manually open ports on his router and forward incoming connection to his machine via port-forwarding.
 
-All in all, for different types of user, given their tech skills and their objectives; this project provides solutions that do not differ much in terms of their implementations.
+All in all, for different types of user, given their tech skills and their objectives; this project provides solutions that do not differ much in terms of their implementations, and that cover their necessities.
 
 \section{Objective 2. Fault-tolerant design capable of working with heterogeneous and ephemeral nodes}
 
