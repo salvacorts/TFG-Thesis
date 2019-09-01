@@ -141,6 +141,14 @@ In conclusion, our system supports multiple operative systems and architectures,
 
 \section{Objective 3. Achieve higher performance level than a non-distributed implementation}
 
+In this section we will discuss the obtained results, comparing our distributed evolutionary model against a sequential implementation. There are two key aspects to analyze; throughput in terms of evaluations per second and solutions found after a given amount of time.
+
+To analyze the throughput of our prototype, we have designed an experiment where we compare a sequential generational model against our distributed implementation. We will measure the average number of evaluated individuals per second for both models. We have deactivated the \textit{Train} operator for both scenarios since it can be a bottleneck for the maximum number of evaluations. In future releases it would be interesting to repeat this experiment enabling clients to perform other costly operators apart from the evaluation of individuals.
+
+Figure \ref{fig:evaluations_experiment} shows the performance gain compared to a sequential generational model. As it can be seen, for just one (native) client, the sequential model slightly outperforms our implementation. This is expected since we have to pay a penalty in terms of latency on the communications between clients and islands.
+
+However, form two clients on, our design is able to achieve a higher throughput than the generational model. Moreover, our design seems to scale pretty well with the number of clients, since as the number of clients increases, the throughput seems to increase almost linearly.
+
 \begin{figure}[h!]
 		\centering
     	\includegraphics[width=\linewidth]{assets/images/experiment-evaluations-second.png}
@@ -149,6 +157,7 @@ In conclusion, our system supports multiple operative systems and architectures,
 \end{figure}
 
 \begin{table}[h!]
+\centering
 \begin{tabular}{|l|l|lll}
 \cline{1-2}
 \multicolumn{2}{|c|}{\textbf{Distributed model}}                          &           &                       & \textbf{}                                             \\ \cline{1-2}
@@ -163,19 +172,84 @@ In conclusion, our system supports multiple operative systems and architectures,
 \label{tab:evaluations_experiment}
 \end{table}
 
+To analyze the capabilities of our prototype to find good solution, we have compared it against \textit{G-Prop} \cite{gprop} using the Glass problem described on previous sections. For this experiment, we set up 4 islands with 4 native clients each. A detailed list of the parameters of each algorithm can be found on Table \ref{tab:fitness-experiment-parameters}.
 
-Mention that we can see the penaly of the communication latency on the throughput with just one client but from 2 clients one we gain in performance on a linear way.
+\begin{table}[h!]
+\centering
+\begin{tabular}{llll|l|l|}
+\cline{1-2} \cline{5-6}
+\multicolumn{2}{|c|}{\textbf{Gprop Parameters}}                              &  &  & \multicolumn{2}{c|}{\textbf{Godeea Parameters}} \\ \cline{1-2} \cline{5-6} 
+\multicolumn{1}{|l|}{Population size}       & \multicolumn{1}{l|}{300}       &  &  & Island size                       & 100         \\ \cline{1-2} \cline{5-6} 
+\multicolumn{1}{|l|}{Generations}           & \multicolumn{1}{l|}{500}       &  &  & Evaluations                       & 700         \\ \cline{1-2} \cline{5-6} 
+\multicolumn{1}{|l|}{Selection rate}        & \multicolumn{1}{l|}{0.3}       &  &  & Cross Selection Tournament size   & 4           \\ \cline{1-2} \cline{5-6} 
+\multicolumn{1}{|l|}{Mutation Prob}         & \multicolumn{1}{l|}{0.3}       &  &  & Mutation Prob                     & 0.3         \\ \cline{1-2} \cline{5-6} 
+\multicolumn{1}{|l|}{Priority Mutate}       & \multicolumn{1}{l|}{1}         &  &  & Addition Prob                     & 0.3         \\ \cline{1-2} \cline{5-6} 
+\multicolumn{1}{|l|}{Priority Addition}     & \multicolumn{1}{l|}{1}         &  &  & Elimination Prob                  & 0.15        \\ \cline{1-2} \cline{5-6} 
+\multicolumn{1}{|l|}{Priority Elimination}  & \multicolumn{1}{l|}{1}         &  &  & Substitution prob                 & 0.15        \\ \cline{1-2} \cline{5-6} 
+\multicolumn{1}{|l|}{Priority Training}     & \multicolumn{1}{l|}{1}         &  &  & Training Prob                     & 0.5         \\ \cline{1-2} \cline{5-6} 
+\multicolumn{1}{|l|}{Initial wigths range}  & \multicolumn{1}{l|}{(0, 0.05]} &  &  & Migration size                    & 10          \\ \cline{1-2} \cline{5-6} 
+\multicolumn{1}{|l|}{Weight mutation rate}  & \multicolumn{1}{l|}{0.005}     &  &  & Initial wigths range              & (0, 0.05]   \\ \cline{1-2} \cline{5-6} 
+\multicolumn{1}{|l|}{LR mutation rate}      & \multicolumn{1}{l|}{0.005}     &  &  & Weight mutation rate              & 0,005       \\ \cline{1-2} \cline{5-6} 
+\multicolumn{1}{|l|}{Hidden layer max size} & \multicolumn{1}{l|}{20}        &  &  & LR mutation rate                  & 0,005       \\ \cline{1-2} \cline{5-6} 
+\multicolumn{1}{|l|}{Training Epochs}       & \multicolumn{1}{l|}{100}       &  &  & Hidden layer max size             & 20          \\ \cline{1-2} \cline{5-6} 
+                                            &                                &  &  & Training Epochs                   & 100         \\ \cline{5-6} 
+\end{tabular}
+\caption{Parameters for the experiment. Parameters settings aim to be as close as possible between both algorithms. Population size and Generations for Gprop set for a execution time of about 60 seconds.}
+\label{tab:fitness-experiment-parameters}
+\end{table}
 
-Mention that there can be performance degradation with the 16 clients experiment since we are running the experiment on a single machine and therefore CPU time is shared between processes.
+Table \ref{tab:fitness-experiment-results} shows the results of the experiment \footnote{The logs for this experiment can be found along with this document}. After about a minute of execution time, Godeea obtained better results than Gprop in terms of the number of failed predictions of samples from testing dataset (i.e. Prediction error).
 
-Mention that this can be further improved by using batching of individuals.
+Figure \ref{fig:fitness-experiment-evolution} shows the evolution of the fitness on the node that found the best solution at the end of the test. As can be seen, the average error, and the error of the best solution, decrease as the algorithm executes. Note that since the average fitness is printed every 100 evaluations, gaps have been filled with the previous value.
 
-Mention that we have disables the training operator since it was a bottleneck on the experiment and could be interesting to run it on the client although we currently do not support other operators apart from the evaluation on the client
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|l|l|l|l|}
+\cline{1-2} \cline{4-5}
+\multicolumn{2}{|c|}{\textbf{Gprop Results}} &           & \multicolumn{2}{c|}{\textbf{Godeea Results}} \\ \cline{1-2} \cline{4-5} 
+Error                 & 73.58490566          &           & Error                 & 18.604651            \\ \cline{1-2} \cline{4-5} 
+Time needed           & 61 seconds           & \textbf{} & Time needed           & 59 seconds           \\ \cline{1-2} \cline{4-5} 
+\end{tabular}
+\caption{Results of the experiment. As can be seen, Godeea obtains better results on the test dataset than Gprop.}
+\label{tab:fitness-experiment-results}
+\end{table}
 
+\textbf{figure of how average fitness and best solution evolve on each node}.
 
-\paragraph*{Evaluations Throughput.} Number of evaluations per second - chart of evaluations per second vs number of clients
-\paragraph*{Exploratory capabilities?}
-\paragraph*{Exploitation capabilities?}
-\paragraph*{Comparison with G-Prop} - Use saved logs - Add/Remove neurons if not achieve better results.
+\begin{figure}[h!]
+		\centering
+    	\includegraphics[width=\linewidth]{assets/images/experiment-fitness-evolution.png}
+    	\caption{Evolution of fitness during the execution of Goodea on the experiment.}
+    	\label{fig:fitness-experiment-evolution}
+\end{figure}
 
-Final discussion about the achievement of this objective
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|l|l|l|}
+\hline
+\multicolumn{1}{|c|}{\textbf{Evaluations}} & \multicolumn{1}{c|}{\textbf{Best Solution}} & \multicolumn{1}{c|}{\textbf{Avg}} & \multicolumn{1}{r|}{\textit{\textbf{Source}}} \\ \hline
+0                                          & 91.43                                       & 84.51                             &                                               \\ \hline
+1                                          & 70.87                                       & 84.51                             &                                               \\ \hline
+9                                          & 67.25                                       & 84.51                             &                                               \\ \hline
+100                                        & 63.74                                       & 84.51                             & \multicolumn{1}{r|}{\textit{broadcasted}}     \\ \hline
+121                                        & 40.00                                       & 84.51                             &                                               \\ \hline
+134                                        & 33.92                                       & 84.51                             &                                               \\ \hline
+145                                        & 33.33                                       & 84.51                             &                                               \\ \hline
+179                                        & 33.01                                       & 84.51                             &                                               \\ \hline
+184                                        & 32.75                                       & 84.51                             &                                               \\ \hline
+199                                        & 28.65                                       & 84.51                             &                                               \\ \hline
+200                                        & 28.65                                       & 68.13                             &                                               \\ \hline
+269                                        & 28.16                                       & 68.13                             & \multicolumn{1}{r|}{\textit{broadcasted}}     \\ \hline
+277                                        & 27.74                                       & 68.13                             &                                               \\ \hline
+300                                        & 27.74                                       & 49.68                             &                                               \\ \hline
+302                                        & 27.49                                       & 49.68                             & \multicolumn{1}{r|}{\textit{broadcasted}}     \\ \hline
+305                                        & 26.32                                       & 49.68                             &                                               \\ \hline
+370                                        & 23.39                                       & 49.68                             & \multicolumn{1}{r|}{\textit{migration}}       \\ \hline
+400                                        & 23.39                                       & 36.47                             &                                               \\ \hline
+500                                        & 23.39                                       & 32.51                             &                                               \\ \hline
+\end{tabular}
+\caption{Raw data for Figure \ref{fig:fitness-experiment-evolution}. Blank \it{source} means that the best solution known so far was found on that node.  }
+\label{tab:fitness-experiment-evolution}
+\end{table}
+
+All in all our design seems to outperforms sequential implementations in both throughput and final results, by scaling pretty well with the number of clients, and keeping a good balance between exploitation and exploration of the solutions search space as well.

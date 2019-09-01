@@ -1,18 +1,20 @@
 \chapter{Conclusions and Future Work}
 
-We have presented the design, implementation, and results of Name\_Of\_Project; a library to easily implement collaborative distributed and decentralized evolutionary algorithms that abstracts the underlying networking and distributed system with a scalable and fault-tolerant peer-to-peer design.
+We have presented the design, implementation, and results of Godeea; a library to easily implement collaborative distributed and decentralized evolutionary algorithms that abstracts the underlying networking and distributed system with a scalable and fault-tolerant peer-to-peer design.
 
-Name\_Of\_Project also provides an extensible design and compatibility with the \textit{eaopt} library \cite{eaopt}. While many evolutionary algorithms libraries only support the classic mutation and crossover operators out of the box, this project enables the user of the library to use as many custom operators as desired while allowing they to use all the already existing mutation and crossover operators from the \textit{eaopt} library.
+Godeea also provides an extensible design and compatibility with the \textit{eaopt} library \cite{eaopt}. While many evolutionary algorithms libraries only support the classic mutation and crossover operators out of the box, this project enables the user of the library to use as many custom operators as desired while allowing they to use all the already existing mutation and crossover operators from the \textit{eaopt} library.
 
 The proposed distributed hybrid pool-island evolutionary model looks like a promising model for problems where the evaluation operator is computationally expensive, problems that requires high exploratory capabilities, and for multi-objective problems where several parameters of a solution have to be optimized. In the last case, several clusters can be created where nodes from each cluster will apply genetic operators that modifies a specific gene of the solution representation.
 
 Even though the use of experimental features from Go's Web Assembly support led us to unexpected constraints and challenges during the development of the project, we were able to address them by looking for alternatives such as the web-sockets listener to serve gRPC requests for browser-based clients. As the Web Assembly support for Golang increases, the performance achieved by this project will increase without having to change much of its code-base.
 
-Of course, Name\_Of\_Project has plenty of room for improvements, and we would like to mention some of them. With regard to the genetic operators that are applied over an island in our design, new selection methods can be implemented so the user of the library has the ability to choose other than the tournament of k individuals. Also, it would be nice to enable the user of the library to decide which operators do the clients apply, so they do not just evaluate individuals from a pool. 
+Of course, Godeea has plenty of room for improvements, and we would like to mention some of them. With regard to the genetic operators that are applied over an island in our design, new selection methods can be implemented so the user of the library has the ability to choose other than the tournament of k individuals. Also, it would be nice to enable the user of the library to decide which operators do the clients apply, so they do not just evaluate individuals from a pool. 
+
+In order to reduce latency between clients and islands, a batching mechanism can be implemented where instead of asking for just one individual on each \textit{BorrowIndividual} request, the client can ask for as many individuals as can fit into a single TCP packet.
 
 With regard to the current client implementation, it could be interesting to design a mechanism where clients in the same network can collaborate between each other like on a cellular distributed evolutionary model. 
 
-Also, having support for Android devices would increase the number of potential collaborators in our platform. note that since we are using Protocol Buffers, exchange of information between the Android and the current implementation should be trivial. 
+Also, having support for Android devices would increase the number of potential collaborators in our platform. note that since we are using Protocol Buffers and gRPC, exchange of information between the Android client and the current implementation should be trivial. 
 
 Besides, even though by having browser support we achieved zero installation requirements for collaborators, at cost of installation requirements, a web extension would increase the chances of a collaborator to start collaborating again every time they open their browser.
 

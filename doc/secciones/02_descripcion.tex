@@ -1,4 +1,7 @@
 \chapter{Problem description}
+
+In this chapter we will discuss the necessity of a tool like Godea, followed by a brief overview of the concepts involved on this project.
+
 \section{The necessity of a distributed system for collaborative science}
 Nowadays, computers play an essential role in scientific research. For most scientists, a desktop machine is enough to store and process the data they work with, but a considerable amount of them need supercomputers to be able to deal with more complex problems \cite{computing-in-science}.
 
@@ -8,17 +11,17 @@ Distributed systems are an attractive alternative to supercomputers. A distribut
 
 In 2002, the \textit{University of California, Berkeley} addressed the problem described above by developing \textit{BOINC}\cite{boinc-website}, a platform for volunteer computing where users can contribute to different scientific projects with their computers or smart-phones. As of June 2019 the platform has achieved a power of over 27 PetaFLOPS in the last twenty-four hours by using 563,506 computers provided by 142,911 volunteers.
 
-Even though \textit{BOINC} is a successful example of how volunteer computing is possible and what it can achieve, it still has room for improvement that this project aims to provide. 
+Even though \textit{BOINC} is a successful example of how volunteer computing is possible and what it can achieve, it still has room for improvement. 
 
-On the one hand, a user willing to volunteer on \textit{BOINC} needs to download and set up his own machine in order to start collaborating with a project: non-tech-savvy users can struggle with this and may give up soon. This project addresses this problem by providing users a way to collaborate where they do not need to install anything apart from a web browser. Since most (if not all) consumer-oriented operative systems such as \textit{Ubuntu}, \textit{Mac OSX} or \textit{Windows} come with a web-browser installed out of the box, this platform provides a zero-installation method for volunteer computing.
+On the one hand, a user willing to volunteer on \textit{BOINC} needs to download and set up his own machine in order to start collaborating with a project: non-tech-savvy users can struggle with this and may give up soon. This project addresses this problem by providing users a way to collaborate where they do not need to install anything apart from a web browser. Since most (if not all) consumer-oriented operative systems such as \textit{Ubuntu}, \textit{Mac OSX} or \textit{Windows} come with a web-browser installed out of the box, this project provides a solution with zero-installation requirements for volunteer computing.
 
-On the other hand, \textit{BOINC} uses a Client-Server architecture where user's machines communicate with a centralized server that assigns them tasks. This centralized approach has a scalability problem where in case that the number of volunteers increases extremely or the amount of requests per user is high enough, the central server will not be able to handle the number of requests made by a user and therefore the performance of the system will reach its limit. This approach makes the system to have a single point of failure as well; if the central server goes down, users will not be able to work towards the common objective since they cannot communicate with each other, and therefore the whole experiment will be paused until the central server goes alive again.  
+On the other hand, \textit{BOINC} uses a Client-Server architecture where user's machines communicate with a centralized server that assigns them tasks. This centralized approach has a scalability problem where in case that the number of volunteers increases extremely or the amount of requests per user is high enough, the central server will not be able to cope with the number of requests made by a user and therefore the performance of the system will be limited. This approach makes the system to have a single point of failure as well; if the central server goes down, users will not be able to work towards the common objective since they cannot communicate with each other, and therefore the whole experiment will be paused until the central server goes alive again, or even lost.  
 
-By using a decentralized architecture where nodes that satisfy certain criteria (detailed in later chapters) act as coordinators of the system, this project aims to provide better scalability and fault-tolerance than BOINC. 
+By using a decentralized architecture where nodes that satisfy certain criteria (detailed in later chapters) act as coordinators of the system, this project aims to achieve better scalability and fault-tolerance than BOINC. 
 
 
 \section{Evolutionary Algorithms}
-Evolutionary Algorithms are metaheuristic optimization algorithms that take natural evolution as an inspiration to solve problems. They apply bio-inspired operations known as \textit{genetic operators} over a set of solutions to the problem called \textit{population}. Each solution inside the \textit{population} is known as \textit{chromosome} and has a \textit{fitness} value based on the quality of the solution itself. A \textit{chromosome} is made of \textit{genes}, these genes are specific characteristics of a solution representation. 
+Evolutionary Algorithms are metaheuristic optimization algorithms that take natural evolution as an inspiration to solve problems. They apply bio-inspired operations known as \textit{genetic operators} over a set of solutions to the problem called \textit{population}. Each solution inside the \textit{population} is known as \textit{chromosome}, or \textit{Individual}, and has a \textit{fitness} value based on the quality of the solution itself. A \textit{chromosome} is made of \textit{genes}, these genes are specific characteristics of a solution representation. 
  
 The simulation of this natural process is a probabilistic optimization technique that frequently achieves better results than other classic methods of solving hard problems. \cite{galist}. 
 
@@ -27,7 +30,7 @@ An overview of the implementation of this algorithm consists of the following st
 \begin{enumerate}
     \item \textbf{Initialization:} create a population with randomly generated chromosomes, and evaluate the fitness of each one.
     
-    \item Until an specified termination condition is met, apply the following genetic operators over the population:
+    \item Until an specified termination condition is met, (e.g. maximum number of evaluations reached), apply the following genetic operators over the population:
     
     \begin{enumerate}
         \item \textbf{\textit{Selection}:} pick which chromosomes from the population will reproduce, in other words, the \textit{crossover} operator will be applied. We should guarantee that the best chromosomes in the population have higher likelihood to be selected, while still giving the opportunity to chromosomes with less quality to reproduce.
@@ -46,7 +49,7 @@ An overview of the implementation of this algorithm consists of the following st
 \begin{figure}[h!]
 \centering
     \includegraphics[width=\linewidth]{assets/images/EA_diagram.png}
-    \caption{Overview of all genetic operators for a Evolutionary Algorithm}
+    \caption{Overview of all genetic operators for a Evolutionary Algorithm. Modified illustration from Dr. F. Herrera  class notes}
     \label{fig:EA_diagram}
 \end{figure}
 
@@ -57,7 +60,7 @@ On the one hand, the selection, crossover and replacement operators focus on the
 On the other hand, mutation and initialization diversify by generating rather different solutions from the existing ones; by doing so, the algorithm is able to explore new regions of the search space as well as avoiding getting stuck in local optima.
 
 \section{Distributed Systems}
-A distributed system is a collection of independent computers that appears to its users as a single coherent system.
+A distributed system is a collection of independent computers that appears to its users as a single coherent system. \cite{dissis_def}.
 
 \begin{figure}[h!]
 \centering
@@ -80,7 +83,7 @@ Shared memory stands for memory that can be accessed concurrently by multiple pr
 \newpage
 Message passing is a method used to request behavior on a remote computer by sending an object containing enough information to select and run the appropriate code on the remote computer. this message passing can be synchronous if the requesting machine waits for the remote one to finish with the requested behavior, or asynchronous if it keeps busy on a different task. While synchronous systems are conceptually less complex, asynchronous ones usually achieve better performance.
 
-Although this last approach comes with an overhead penalty due to data copying and delivery across machines, it is the best scaling one since interacting machines do not need to be close to each other to exchange information. Furthermore, because data sharing is explicit in message passing, there is less chance for error. 
+Although this last approach comes with an overhead penalty due to data copying and delivery across machines, it is the best scaling one since interacting machines do not need to be close to each other to exchange information. Furthermore, because data sharing is explicit in message passing, there is less chance for errors to arise. 
 
 \subsection{CAP Theorem}
 The CAP Theorem states that it is impossible for any distributed system to simultaneously provide consistency, availability and partition tolerance. Only two out of these three properties can be provided at the same time\cite{wikipedia_cap}.
@@ -94,7 +97,7 @@ With the aim of easily explaining what these three properties are, as well as de
     \label{fig:dis-sys-1}
 \end{wrapfigure}
 
-Given a distributed system with two servers, $G_{1}$ and $G_{2}$, that can communicate with each other and are in charge of storing the value for a variable $v$ initialized to $v_{0}$. A client can request to write or read $v$ to any server that will answer back.
+Given a distributed system with two servers, $G_{1}$ and $G_{2}$, that can communicate with each other and are in charge of storing the value for a variable $v$ initialized to $v_{0}$. An a client that can request to write or read $v$ to any server that will answer back.
 
 In a consistent system (Figure \ref{fig:consisten_system}), any read operation must return the latest written value within the whole system. In our example, if the client writes a new value $v_{1}$ for $v$ in $G_{1}$, when the client later reads $v$ from $G_{2}$, the server must return $v_{1}$.
 \begin{figure}[h!]
@@ -133,11 +136,11 @@ In this type of distributed system, we can distinguish two main components. The 
 \begin{figure}[h!]
 \centering
     \includegraphics[width=\linewidth]{assets/images/client-server.png}
-    \caption{Client-Server architecture. Left, simple one. Right, with load-balancing}
+    \caption{Client-Server architecture. Left, simple approach. Right, with load-balancing}
     \label{fig:client-server}
 \end{figure}
 
-The main disadvantages of this architecture is that it scales poorly than other architectures and it has a single point of failure since usually only one server handles all the requests from the clients. The scalability problem can be reduced by using load-balancing, where client requests are spitted among various servers that are able to handle these requests (Figure \ref{fig:client-server}).
+The main disadvantages of this architecture is that it has a single point of failure and scales poorly than other architectures since usually only one server handles all the requests from the clients. The scalability problem can be reduced by using load-balancing, where client requests are spitted among various servers that are able to handle these requests (Figure \ref{fig:client-server}).
 
 \subsubsection*{Peer-to-peer}
 Shortened as \textit{P2P}, it is a distributed system model where no central coordination by a server or stable hosts is needed. Instead, all responsibilities are uniformly divided among all machines, known as peers. Peers can serve both as clients and as servers\cite{p2p-principles}.
@@ -172,7 +175,7 @@ Peer-to-peer networks implements a virtual network in the application layer that
           \caption{}
           \label{fig:sub2}
         \end{subfigure}
-        \caption{(a) Finger table of a DHT. (b) Lookup of resource with key $54$ }
+        \caption{(a) Finger table of a DHT. (b) Lookup of resource with key $54$. \cite{dht_image}}
         \label{fig:dht}
     \end{figure}
 
@@ -182,7 +185,7 @@ This architecture is a mixture of both Client-Server and Peer-to-Peer systems wh
 
 This model often achieves better performance than pure Client-Server or Peer-to-Peer. Since certain functions that tends to create high networking traffic in a P2P system can by avoided using a centralized approach.
 
-A good example of system using this approach is BitTorrent\cite{bittorrent} (Figure \ref{fig:bittorrent}). With a Client-Server model, \textit{tracker} servers and \textit{torrent} repositories provides structured virtual network, while the rest of nodes constitute the unstructured network with a Peer-to-Peer approach.
+A good example of system using this approach is BitTorrent\cite{bittorrent} (Figure \ref{fig:bittorrent}). With a Client-Server model, \textit{tracker} servers and \textit{torrent} repositories provides a structured virtual network, while the rest of nodes constitute the unstructured network with a Peer-to-Peer approach.
 
 \begin{figure}[h!]
     \centering

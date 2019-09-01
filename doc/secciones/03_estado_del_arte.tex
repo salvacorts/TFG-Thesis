@@ -47,7 +47,7 @@ All islands should end up having the best solution so far within their subpopula
 
 An important design decision for a island distributed EA is the topology of the islands. Whitley et al \cite{140} conducted an experiment where all islands were fully connected without using any kind of topology. They found that if the migration is conducted among all islands, the algorithm achieves almost the same results as a sequential execution. In recent years, different network topologies for island models have been being studies. Network topologies such as ring, torus, or layered have achieved superior performance in different experiments. \cite{62}
 
-Scalability of this model is limited since performance highly depends on the number of islands and its resulting granularity \cite{58}. However, it has a good partition-tolerance since, although a failing island means a lost important portion of the entire population, it does not have any single-point of failure.
+Scalability of this model is limited since performance highly depends on the number of islands and its resulting granularity \cite{58}. However, it has a good fault-tolerance since, although a failing island means a lost important portion of the entire population, it does not have any single-point of failure.
 
 \subsection{Cellular}
 In this model the entire population is distributed across all processors having ideally one chromosome per processor. Communication between processors is defined by a network topology where chromosomes can only compete and mate with its neighbors.
@@ -82,7 +82,7 @@ This model addresses the scalability shortcoming of the island-based model as we
 
 \paragraph*{Island \& cellular} Multiple processors that store a cells each one, are combined into groups of cells that will behave as islands. The quality of the solutions this model finds are comparable to classical distributed models but it provides better scalability and fault-tolerance.
 
-\paragraph*{Island \& Island} When processors in island-model model are heterogeneous, but the model itself is homogeneous (all islands share the same settings of operators, control parameters, fitness evaluations, etc...), slower processors will slow-down the entire algorithm execution. Furthermore, a homogeneous model may not keep a proper balance between exploitation and exploration.  
+\paragraph*{Island \& Island} When processors on an island-model model are heterogeneous, but the model itself is homogeneous (all islands share the same settings of operators, control parameters, fitness evaluations, etc...), slower processors will slow-down the entire algorithm execution. Furthermore, a homogeneous model may not keep a proper balance between exploitation and exploration.  
 
 Heterogeneus island models are being developed in order to address that issue. Sefrioui et al \cite{112}. designed a layered island model of three layers where the first layer was in charge of exploiting the already explored solution space, the second layer balanced exploitation and exploration, and the third one was fully-exploratory.
 
@@ -111,7 +111,7 @@ The logic behind the server, also known as \textit{backend}, can be implemented 
 
 	\item \textbf{Python.} Django \cite{django} which follows a Model-View-Controller (MVC) architecture. It comes with out of the box support for user authentication, security analysis, database integration, and administration GUI. Examples of major sites using this framework are \textit{Instagram}, \textit{Bitbucket}, or \textit{Pinterest}. \cite{django-websites}
 	
-	\item \textbf{Ruby.} Rails adopts the MVC architecture as well. It comes with the benefits of ruby like rapid-development and easy deployment and configuration. Major websites using this framework are \textit{GitHub}, \textit{Airbnb}, or \textit{Shopify}. \cite{rails}
+	\item \textbf{Ruby.} Rails adopts the MVC architecture as well. It comes with the benefits of ruby, like rapid-development, easy deployment, and configuration capabilities. Major websites using this framework are \textit{GitHub}, \textit{Airbnb}, or \textit{Shopify}. \cite{rails}
 \end{enumerate}
 
 \subsection{Client-Side processing}
@@ -123,11 +123,9 @@ In 2008, Google released \textit{Chrome V8} \cite{chrome_v8}, the open-source Ja
 
 Firefox, on the other hand, uses SpiderMonkey which compiles to native code critical parts of the scripts to be executed \cite{tampermoneky}. The remaining code that is not compiled to native code is compiled to a special byte-code which although is not as fast as native code, it is faster to interpret.
 
-A comparison between these two browsers can be obtained in \cite{firefox_benchmark}. As can seen, in the most recent releases of both browsers, Chrome V8 has the best overall performance.
+A comparison between these two browsers can be found at \cite{firefox_benchmark}. It shows that on recent releases of both browsers, Chrome V8 has the best overall performance.
 
 \subsection{Hybrid approach}
-Speak about using both client side scripting and server side scripting and comunication methods such as (g)RPC, HTTP Rest, etc...
-
 Webpages often take a hybrid approach where the DOM is manipulated client-side but certain information is obtained server-side since there are specific tasks that should not or cannot be performed in the client because they can require access delicate information or high processing power. This information is usually requested to a server by using a SOAP, REST or gRPC service.
 
 \begin{enumerate}[a)]
@@ -139,9 +137,9 @@ Webpages often take a hybrid approach where the DOM is manipulated client-side b
 
 	\item \textbf{RPC.} Abbreviation of Remote Procedure Call, it is a remote method invocation protocol where a client can request a server to execute a subroutine and get its result. RPC enables the programmer to invoke that remote procedure as if it was a local procedure, without the programmer explicitly coding the underlying communication.
 	
-	After using it internally for years, Google released gRPC \cite{grpc} in 2015; an open source RPC system that uses HTTP for transport. Data serialization and interface definition is made with Protocol Buffers; Google's language-neutral, platform-neutral and extensible solution for serializing structured data \cite{protobuf}.
+	After using it internally for years, Google released gRPC \cite{grpc} in 2015; an open source RPC system that uses HTTP/2 for transport. Data serialization and interface definition is made with Protocol Buffers; Google's language-neutral, platform-neutral and extensible solution for serializing structured data \cite{protobuf}.
 	
-	As seen in Figure \ref{fig:protobuff_json_xml}, by using Protocol Buffers, gRPC is able to outperform JSON and XML serialization time and in-memory size. In 2019, gRPC announced support for web-browsers \cite{grpc-web-announce} and positioned as a promising alternative to REST and SOAP. 
+	As seen in Figure \ref{fig:protobuff_json_xml}, by using Protocol Buffers, gRPC is able to outperform JSON and XML serialization time and in-memory size. In 2019, gRPC announced support for JavaScript \cite{grpc-web-announce} and positioned as a promising alternative to REST and SOAP.
 	
 	\begin{figure}[h!]
 		\centering
