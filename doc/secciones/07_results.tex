@@ -178,7 +178,7 @@ To analyze the capabilities of our prototype to find good solution, we have comp
 \centering
 \begin{tabular}{llll|l|l|}
 \cline{1-2} \cline{5-6}
-\multicolumn{2}{|c|}{\textbf{Gprop Parameters}}                              &  &  & \multicolumn{2}{c|}{\textbf{Godeea Parameters}} \\ \cline{1-2} \cline{5-6} 
+\multicolumn{2}{|c|}{\textbf{Gprop Parameters}}                              &  &  & \multicolumn{2}{c|}{\textbf{Gocey Parameters}} \\ \cline{1-2} \cline{5-6} 
 \multicolumn{1}{|l|}{Population size}       & \multicolumn{1}{l|}{300}       &  &  & Island size                       & 100         \\ \cline{1-2} \cline{5-6} 
 \multicolumn{1}{|l|}{Generations}           & \multicolumn{1}{l|}{500}       &  &  & Evaluations                       & 700         \\ \cline{1-2} \cline{5-6} 
 \multicolumn{1}{|l|}{Selection rate}        & \multicolumn{1}{l|}{0.3}       &  &  & Cross Selection Tournament size   & 4           \\ \cline{1-2} \cline{5-6} 
@@ -198,7 +198,7 @@ To analyze the capabilities of our prototype to find good solution, we have comp
 \label{tab:fitness-experiment-parameters}
 \end{table}
 
-Table \ref{tab:fitness-experiment-results} shows the results of the experiment \footnote{The logs for this experiment can be found along with this document}. After about a minute of execution time, Godeea obtained better results than Gprop in terms of the number of failed predictions of samples from testing dataset (i.e. Prediction error).
+Table \ref{tab:fitness-experiment-results} shows the results of the experiment \footnote{The logs for this experiment can be found along with this document}. After about a minute of execution time, Gocey obtained better results than Gprop in terms of the number of failed predictions of samples from testing dataset (i.e. Prediction error).
 
 Figure \ref{fig:fitness-experiment-evolution} shows the evolution of the fitness on the node that found the best solution at the end of the test. As can be seen, the average error, and the error of the best solution, decrease as the algorithm executes. Note that since the average fitness is printed every 100 evaluations, gaps have been filled with the previous value.
 
@@ -206,11 +206,11 @@ Figure \ref{fig:fitness-experiment-evolution} shows the evolution of the fitness
 \centering
 \begin{tabular}{|l|l|l|l|l|}
 \cline{1-2} \cline{4-5}
-\multicolumn{2}{|c|}{\textbf{Gprop Results}} &           & \multicolumn{2}{c|}{\textbf{Godeea Results}} \\ \cline{1-2} \cline{4-5} 
+\multicolumn{2}{|c|}{\textbf{Gprop Results}} &           & \multicolumn{2}{c|}{\textbf{Gocey Results}} \\ \cline{1-2} \cline{4-5} 
 Error                 & 73.58490566          &           & Error                 & 18.604651            \\ \cline{1-2} \cline{4-5} 
 Time needed           & 61 seconds           & \textbf{} & Time needed           & 59 seconds           \\ \cline{1-2} \cline{4-5} 
 \end{tabular}
-\caption{Results of the experiment. As can be seen, Godeea obtains better results on the test dataset than Gprop.}
+\caption{Results of the experiment. As can be seen, Gocey obtains better results on the test dataset than Gprop.}
 \label{tab:fitness-experiment-results}
 \end{table}
 

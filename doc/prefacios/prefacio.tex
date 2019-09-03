@@ -1,7 +1,7 @@
 \thispagestyle{empty}
 
 \begin{center}
-{\large\bfseries Godea. Go Decentralized Evolutionary Algorithm  \\ Collaborative science library to running evolutionary algorithms on ephemeral infrastructure }\\
+{\large\bfseries Gocey. Distributed Evolutionary Algorithms on Ephemeral Infrastructure  \\ A Go library to run decentralized evolutionary algorithms powered by a peer-to-peer collaborative science network }\\
 \end{center}
 \begin{center}
 Salvador Corts Sánchez\\
@@ -14,12 +14,21 @@ Salvador Corts Sánchez\\
 \vspace{0.7cm}
 
 \noindent{\textbf{Abstract}\\
+
+The amount of internet-capable devices in the world increases each year. Since many of these devices are partially idle all the time, an incredible amount of resources available for computation are being wasted.
+
+The result of this project is Gocey, a Golang library that aims to use these potential resources to build a collaborative science network. This library enables developers to easily implement and deploy scalable and fault-tolerant peer-to-peer systems to run distributed evolutionary algorithms.
+
+Gocey proposes a novel hybrid pool-island distributed evolutionary model where peers in the network can take the role of islands or evaluators. Islands are in charge of applying genetic operators on their individuals and migrating individuals to other islands on the network. Evaluators, on the other hand, are in charge of evaluating the individuals from those islands.
+
+While this model aims to maintains a good balance between exploitation and exploration, Gocey also provides an abstraction on the underlying networking and the distributed system it creates; enabling tech-savvy and non tech-savvy users to collaborate on the system.
+
 	
 
 \cleardoublepage
 
 \begin{center}
-	{\large\bfseries Godea. Go Decentralized Evolutionary Algorithm \\ Librería para ejecutar algoritmos evolutivos sobre infraestructura efímera basada en un sistema de ciencia colaborativa}\\
+	{\large\bfseries Gocey. Algoritmos Evolutivos Distribuidos usando Infraestructura Efímera\\ Una librería de Go para ejecutar algoritmos evolutivos decentralizados utilizando una red peer-to-peer de ciencia colaborativa }\\
 \end{center}
 \begin{center}
 	Salvador Corts Sánchez\\
@@ -29,6 +38,14 @@ Salvador Corts Sánchez\\
 \vspace{0.7cm}
 
 \noindent{\textbf{Resumen}\\
+
+La cantidad de dispositivos conectados a internet en el mundo aumenta cada año. Muchos de estos dispositivos no son usados por sus usuarios activamente la mayor parte del tiempo y, por lo tanto, una gran cantidad de recursos disponibles para tareas de computación se desperdician.
+
+El resultado de este proyecto es Gocey, un librería para Golang que aspira a usar estos recursos para construir un sistema de ciencia colaborativa. Esta libraría permite a desarrolladores implementar y desplegar sistemas peer-to-peer escalables y tolerante a fallos, para ejecutar algoritmos evolutivos distribuidos.
+
+Gocey propone un nuevo modelo evolutivo híbrido isla-piscina donde los miembros de la red pueden tomar el rol de islas o evaluadores. Las islas se encargan de aplicar operadores genéticos sobre sus individuos y de migrarlos a otras islas del sistema. Los evaluadores, por otra parte, se encargan de evaluar los individuos de las islas.
+
+Este modelo intenta mantener un buen balance entre exploración y explotación, pero además, Gocey abstrae la red y el sistema distribuido subyacente que crea, de manera que tanto usuarios expertos como no expertos en tecnología pueden colaborar en el sistema.
 
 
 \cleardoublepage
@@ -63,6 +80,6 @@ Y para que conste, expiden y firman el presente informe en Granada a Junio de 20
 
 \chapter*{Acknowledgments}
 
+Thanks to Juan Julián Merelo Guervós, my supervisor, for his help and guidance through the development of this project.
 
-
-
+And special thanks to my family who gave me all their love and what they have, to be the person I am today. And to Blanca, for these awesome years that gave me the energy and motivation for this project.
