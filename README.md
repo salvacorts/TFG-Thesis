@@ -4,6 +4,12 @@
 ### Tutor(a)(es): Juan Julián Merelo Guervós
 ___
 
+## Requirements
+
+- TeXLive: `sudo apt install texlive texlive-fonts-extra`
+- [listings-golang](https://github.com/julienc91/listings-golang)
+
+## Compile
 La documentación de este proyecto está realizada con `LaTeX`, por lo
 tanto para generar el archivo PDF necesitaremos instalar `TeXLive` en
 nuestra distribución.
