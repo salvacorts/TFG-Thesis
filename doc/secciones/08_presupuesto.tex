@@ -1,0 +1,35 @@
+\chapter{Development Time and Budget}
+
+In this chapter we will analyze the time needed to develop this project and set a price for it. Then, we will analyze different alternatives to deploy this system and the budget we would need to do so.
+
+\section{Project Billing}
+
+We will calculate the value of this project in terms of the time needed to develop it. Thanks to have been using \textit{Git} as our version control system, we have been keeping track of the time expended on this project indirectly.
+
+We will use \textit{Git Hours} \cite{git-hours} to calculate the time spent based on the time-stamp of the commits pushed to our repository and the difference in time between them. The algorithm iterates through all commits on a repository and works as follows:
+
+\begin{enumerate}
+	\item If the difference of the time-stamp between two commits is equal or smaller than a given threshold (in our case two hours), group them into the same development session. Otherwise, end the current development session and create a new session starting with the second commit.
+	
+	\item Since before the first commit of a session, there is some time needed to make the changes from it; add three extra hours to the coding session.
+	
+	\item Aggregate time from all coding sessions.
+\end{enumerate}
+
+In our case, we invested approximately 170, hours to develop this project, and 127 for this document. Since the average Junior Software Engineer salary in Spain is 20,456€ \cite{payscale}; working 5 days a week, 8 hours per day, it equal to 9.83€ per hour. Hence, an estimated value for our project would be 1671.1€, or 2919.51€ taking into account this document as well.
+
+
+\section{Deployment Budget}
+
+Even though this project can be ran on modest machines along with other processes in the background, a developer might want to dedicate specific resources to run several nodes. We will analyze the usage cost of the system based on the number of nodes and the major infrastructure providers: Google, Amazon and Microsoft.
+
+Since we would need at least two clients per island to outperform a sequential model, at least three nodes must be running on the system. This will be our minimum operational cost.
+
+\paragraph*{Google Cloud.} Using \textit{Compute Engine} (\textit{n1-standard-1}); a virtual machine running Ubuntu, with 1 core, and 3.75 GB of RAM. Running a node would cost 24.27 US\$ per month. Therefore, the minimum operational cost is 72.81 US\$. \cite{gcp-calculator}
+
+\paragraph*{Amazon Web Services.} Using an \textit{EC2 Instance} (t3a.medium), with Linux, 1 core, and 4 GB of RAM would cost 17.23 US\$ per month per node. Minimum operational cost of 51.69 US\$ per month. \cite{aws-calculator}
+
+\paragraph*{Azure.} Using a standard virtual machine (\textit{A1}), with Ubuntu, 1 core, and 1.75GB of RAM would have a monthly cost of 22.63 US\$ per node in the system. Minimum operational cost of 67.89 US\$. \cite{azure-calculator}
+
+\paragraph*{}
+As can be seen, the monthly cost of the system is really low, and even more if we taken into account that different people can collaborate with each other and share operational cost.
